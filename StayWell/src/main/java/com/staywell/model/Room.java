@@ -19,12 +19,13 @@ public class Room {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer roomId;
-	private String roomNumber;
+	private Integer roomNumber;
 	private String roomType;
 	private Integer noOfPerson;
 	private BigDecimal price;
-	private boolean available;
+	private Boolean available;
 	
 	@ManyToOne
 	private Hotel hotel;
+	
 }
