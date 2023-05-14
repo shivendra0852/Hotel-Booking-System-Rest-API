@@ -90,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService{
 
                reservations.forEach(el ->{
 
-                   if(el.getStatus().equals("ACTIVE")) throw new CustomerException("Can't delete. Reservation is not closed ");
+                   if(!el.getStatus().equals("CLOSED")) throw new CustomerException("Can't delete. Reservation is not closed ");
                });
 
                cDao.delete(customer);
