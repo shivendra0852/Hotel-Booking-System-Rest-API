@@ -12,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,13 +24,16 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Hotel {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer hotelId;
 	private String name;
 	@Column(unique = true)
+	@Email
+	@NotNull
 	private String hotelEmail;
 	private String hotelPhone;
 	private String hotelTelephone;
+	
 	private String password;
 	private Address hotel_address;
 	private String role;
