@@ -38,5 +38,8 @@ public class Reservation {
 	private Room room;
 	
 	@ManyToOne
+	private Hotel hotel;
+	
+	@ManyToOne
 	private Customer customer;
 }

@@ -8,6 +8,6 @@ import com.staywell.model.Hotel;
 
 public interface HotelDao extends JpaRepository<Hotel, Integer>{
 
-	Optional<Hotel> findByEmail(String email);
+	Optional<Hotel> findByHotelEmail(String email);
 
 }

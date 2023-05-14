@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.staywell.enums.HotelType;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,11 +25,12 @@ public class Hotel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer hotelId;
 	private String name;
-	private String email;
-	private String phone;
-	private String telephone;
+	@Column(unique = true)
+	private String hotelEmail;
+	private String hotelPhone;
+	private String hotelTelephone;
 	private String password;
-	private Address address;
+	private Address hotel_address;
 	private String role;
 	
 	@Enumerated(EnumType.STRING)

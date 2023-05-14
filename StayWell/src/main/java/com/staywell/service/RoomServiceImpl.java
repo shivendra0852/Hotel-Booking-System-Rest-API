@@ -30,7 +30,7 @@ public class RoomServiceImpl implements RoomService{
 	public Room addRoom(Room room) throws RoomException {
 		
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Hotel hotel = hotelDao.findByEmail(email).get();
+		Hotel hotel = hotelDao.findByHotelEmail(email).get();
 		
 		List<Room> rooms = hotel.getRooms();
 		for(Room r : rooms) {
@@ -50,7 +50,7 @@ public class RoomServiceImpl implements RoomService{
 	public Room updateRoom(Integer roomNo, RoomDTO roomDTO) throws RoomException {
 		
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Hotel hotel = hotelDao.findByEmail(email).get();
+		Hotel hotel = hotelDao.findByHotelEmail(email).get();
 		
 		Room room = null;
 		List<Room> rooms = hotel.getRooms();
@@ -86,7 +86,7 @@ public class RoomServiceImpl implements RoomService{
 	public String removeRoom(Integer roomNo) throws RoomException{
 		
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Hotel hotel = hotelDao.findByEmail(email).get();
+		Hotel hotel = hotelDao.findByHotelEmail(email).get();
 		
 		Room room = null;
 		List<Room> rooms = hotel.getRooms();
