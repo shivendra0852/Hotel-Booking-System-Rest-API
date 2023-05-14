@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,15 +27,24 @@ public class Hotel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer hotelId;
+	@NotNull
+	@NotEmpty
 	private String name;
 	@Column(unique = true)
 	@Email
 	@NotNull
 	private String hotelEmail;
+	@NotNull
+	@NotEmpty
 	private String hotelPhone;
+	@NotNull
+	@NotEmpty
 	private String hotelTelephone;
-	
+	@NotNull
+	@NotEmpty
 	private String password;
+	@NotNull
+	@NotEmpty
 	private Address hotel_address;
 	private String role;
 	
@@ -51,4 +61,7 @@ public class Hotel {
 	@OneToMany(mappedBy = "hotel")
 	private List<Feedback> feedbacks;
 
+	
+	
+	
 }

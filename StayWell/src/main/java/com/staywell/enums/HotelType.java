@@ -1,7 +1,9 @@
 package com.staywell.enums;
 
 public enum HotelType {
-
+ 
+	
+	/*types of hotel supported in the application*/
 	Hotel,
 	Apartment,
 	Resort,
