@@ -2,6 +2,8 @@ package com.staywell.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -103,7 +105,7 @@ public class RoomServiceImpl implements RoomService{
 		
 		List<Reservation> reservations = hotel.getReservations();
 		for(Reservation r : reservations) {
-			if(r.getRoom().getRoomNumber() == roomNo) {
+			if(r.getRoom().getRoomNumber() == roomNo && !r.getStatus().toString().equals("CLOSED")) {
 				room.setAvailable(false);
 				roomDao.save(room);
 				throw new RoomException("Booked Room can't be removed, but it is set to not available for future bookings");
@@ -119,7 +121,30 @@ public class RoomServiceImpl implements RoomService{
 	@Override
 	public List<Room> getAllAvailableRoomsByHotelId(Integer hotelId, LocalDateTime checkIn, LocalDateTime checkOut) {
 		
-		return null;
+		Optional<Hotel> opt = hotelDao.findById(hotelId);
+		if(opt.isEmpty()) {
+			throw new HotelException("Hotel not found with id : " + hotelId);
+		}
+		
+		Hotel  hotel = opt.get();
+		
+		List<Room> rooms = hotel.getRooms().stream().filter(h -> h.getAvailable()).collect(Collectors.toList());
+		List<Reservation> reservations = hotel.getReservations().stream().filter((r) -> !r.getStatus().toString().equals("CLOSED")).collect(Collectors.toList());
+		
+		for(Reservation r : reservations) {
+			for(Room room : rooms) {
+				if((room.getRoomId()==r.getRoom().getRoomId()) &&
+						(checkIn.isAfter(r.getCheckinDate()) && checkIn.isBefore(r.getCheckinDate())) ||
+						(checkOut.isAfter(r.getCheckinDate()) && checkOut.isBefore(r.getCheckinDate()))
+						) {
+					rooms.remove(room);
+				}
+			}
+		}
+		
+		if(rooms.isEmpty()) throw new RoomException("Rooms not found in this hotel");
+		
+		return rooms;
 		
 	}
 
