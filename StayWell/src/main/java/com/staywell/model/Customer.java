@@ -24,16 +24,13 @@ public class Customer {
 	@Column(unique = true)
 	private String email;
 	private String phone;
-	
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 	private LocalDate dob;
 	private String password;
-	
 	@Embedded
 	private Address address;
 	private String role;
-	
 	@OneToMany(mappedBy = "customer")
 	private List<Reservation> reservations;
 	private LocalDateTime registrationDateTime;

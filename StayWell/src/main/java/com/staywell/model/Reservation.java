@@ -40,5 +40,8 @@ public class Reservation {
 	
 	@JsonIgnore
 	@ManyToOne
+	private Hotel hotel;
+	
+	@ManyToOne
 	private Customer customer;
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.staywell.enums.HotelType;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,6 +12,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,14 +25,27 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Hotel {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer hotelId;
+	@NotNull
+	@NotEmpty
 	private String name;
-	private String email;
-	private String phone;
-	private String telephone;
+	@Column(unique = true)
+	@Email
+	@NotNull
+	private String hotelEmail;
+	@NotNull
+	@NotEmpty
+	private String hotelPhone;
+	@NotNull
+	@NotEmpty
+	private String hotelTelephone;
+	@NotNull
+	@NotEmpty
 	private String password;
-	private Address address;
+	@NotNull
+	@NotEmpty
+	private Address hotel_address;
 	private String role;
 	
 	@Enumerated(EnumType.STRING)
@@ -44,4 +61,7 @@ public class Hotel {
 	@OneToMany(mappedBy = "hotel")
 	private List<Feedback> feedbacks;
 
+	
+	
+	
 }
