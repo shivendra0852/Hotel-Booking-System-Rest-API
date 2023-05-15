@@ -58,31 +58,27 @@ public class ReservationServiceImpl implements ReservationService {
 		
 		if(existingReservation!=null) {
 			
-			if(customer!=null) {
-				if(reservationDto.getCheckinDate()!=null) {
-					existingReservation.setCheckinDate(reservationDto.getCheckinDate());
-				}
-				
-				if(reservationDto.getCheckoutDate()!=null) {
-					existingReservation.setCheckoutDate(reservationDto.getCheckoutDate());
-				}
-				
-				if(reservationDto.getNoOfPerson()!=null) {
-					if(reservationDto.getNoOfPerson()<=existingReservation.getRoom().getNoOfPerson()) {
-						existingReservation.setNoOfPerson(reservationDto.getNoOfPerson());
-					} else {
-						throw new ReservationException("No of person cannot fit in the room please book another room!");
-					}
-				}
-				
-				return reservationDao.save(existingReservation);
-			} else {
-				throw new ReservationException("Reservation not found with reservation id: "+reservationId);
+			throw new ReservationException("Reservation not found with reservation id: "+reservationId);
+			
+		}
+		
+			if(reservationDto.getCheckinDate()!=null) {
+				existingReservation.setCheckinDate(reservationDto.getCheckinDate());
 			}
 			
-		} else {
-			throw new ReservationException("Reservation not found with reservation id: "+reservationId);
-		}
+			if(reservationDto.getCheckoutDate()!=null) {
+				existingReservation.setCheckoutDate(reservationDto.getCheckoutDate());
+			}
+			
+			if(reservationDto.getNoOfPerson()!=null) {
+				if(reservationDto.getNoOfPerson()<=existingReservation.getRoom().getNoOfPerson()) {
+					existingReservation.setNoOfPerson(reservationDto.getNoOfPerson());
+				} else {
+					throw new ReservationException("No of person cannot fit in the room please book another room!");
+				}
+			}
+			
+			return reservationDao.save(existingReservation);
 		
 	}
 
@@ -93,18 +89,20 @@ public class ReservationServiceImpl implements ReservationService {
 		Customer customer = customerDao.findByEmail(email).get();
 		Reservation existingReservation = reservationDao.findById(reservationId).get();
 		
-		if(existingReservation!=null) {
+		if(existingReservation==null) {
 			
-			if(customer!=null) {
-				reservationDao.delete(existingReservation);
-				return "Reservation deleted successfully.";
-			} else {	
-				throw new ReservationException("Reservation not found with reservation id: "+reservationId);
-			}
 			
-		} else {
+			throw new ReservationException("Reservation not found with reservation id: "+reservationId);
+			
+		}
+		
+		if(customer==null) {
 			throw new ReservationException("Reservation not found with reservation id: "+reservationId);
 		}
+		
+		reservationDao.delete(existingReservation);
+		
+		return "Reservation deleted successfully.";
 		
 	}
 
@@ -112,32 +110,26 @@ public class ReservationServiceImpl implements ReservationService {
 	public List<Reservation> getAllReservations() throws ReservationException {
 		
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Hotel hotel = hotelDao.findByEmail(email).get();
+		Hotel hotel = hotelDao.findByHotelEmail(email).get();
 		
-		if(hotel!=null) {
-			
 			List<Reservation> reservations = reservationDao.findAll();
 			List<Reservation> result = new ArrayList<>();
 			
 			if(reservations.isEmpty()) {
 				throw new ReservationException("No reservations found.");
-			} else {
-				for(Reservation r:reservations) {
-					if(r.getRoom().getHotel().getHotelId()==hotel.getHotelId()) {
-						result.add(r);
-					}
-				}
-				
-				if(result.isEmpty()) {
-					throw new ReservationException("No reservations found.");
-				} else {
-					return result;
+			}
+			
+			for(Reservation r:reservations) {
+				if(r.getRoom().getHotel().getHotelId()==hotel.getHotelId()) {
+					result.add(r);
 				}
 			}
 			
-		} else {
-			throw new ReservationException("Please login first");
-		}
+			if(result.isEmpty()) {
+				throw new ReservationException("No reservations found.");
+			}
+			
+			return result;
 		
 	}
 
@@ -146,32 +138,28 @@ public class ReservationServiceImpl implements ReservationService {
 		
 		Optional<Reservation> reservation = reservationDao.findById(ReservationId);
 		
-		if(reservation.isPresent()) {
-			return reservation.get();
-		} else {
+		if(!reservation.isPresent()) {
 			throw new ReservationException("Reservation not found with reservation id: "+ReservationId);
 		}
+		return reservation.get();
 	}
 
 	@Override
 	public List<Reservation> getReservationByCustomerId(Integer CustomerId) throws ReservationException {
 
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Customer customer = customerDao.findByEmail(email).get();
+		Customer customer = customerDao.findById(CustomerId).get();
 		
-		if(customer!=null) {
-			
-			List<Reservation> reservations = reservationDao.findByCustomer(customer);
-			
-			if(reservations.isEmpty()) {
-				throw new ReservationException("No reservations found with customerid: "+CustomerId);
-			} else {
-				return reservations;
-			}
-			
-		} else {
+		if(customer==null) {
 			throw new ReservationException("Customer not found with customerid: "+CustomerId);
 		}
+		
+		List<Reservation> reservations = reservationDao.findByCustomer(customer);
+		
+		if(!reservations.isEmpty()) {
+			return reservations;
+		}
+		throw new ReservationException("No reservations found with customerid: "+CustomerId);
 
 	}
 

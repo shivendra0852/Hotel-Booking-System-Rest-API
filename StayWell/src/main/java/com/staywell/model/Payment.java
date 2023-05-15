@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import com.staywell.enums.PaymentType;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,7 @@ public class Payment {
 //    private String cvv;
 //    private LocalDate expirationDate;
 	
+	@Enumerated(EnumType.STRING)
 	private PaymentType paymentType;
 	private Boolean paymentStatus;
 
