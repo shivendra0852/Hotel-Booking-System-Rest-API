@@ -112,7 +112,7 @@ public class ReservationServiceImpl implements ReservationService {
 	public List<Reservation> getAllReservations() throws ReservationException {
 		
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Hotel hotel = hotelDao.findByEmail(email).get();
+		Hotel hotel = hotelDao.findByHotelEmail(email).get();
 		
 		if(hotel!=null) {
 			

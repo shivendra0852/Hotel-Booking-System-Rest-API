@@ -121,7 +121,7 @@ public class RoomServiceImpl implements RoomService{
 	@Override
 	public List<Room> getAllAvailableRoomsByHotelId(Integer hotelId, LocalDateTime checkIn, LocalDateTime checkOut) {
 		
-		Optional<Hotel> opt = hotelDao.findById(hotelId);
+		Optional<Hotel> opt = hotelDao.findByHotelId(hotelId);
 		if(opt.isEmpty()) {
 			throw new HotelException("Hotel not found with id : " + hotelId);
 		}
