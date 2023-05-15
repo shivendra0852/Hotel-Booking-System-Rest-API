@@ -6,14 +6,7 @@ import java.util.List;
 
 import com.staywell.enums.Gender;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +20,8 @@ public class Customer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer customerId;
 	private String name;
+
+	@Column(unique = true)
 	private String email;
 	private String phone;
 	@Enumerated(EnumType.STRING)
