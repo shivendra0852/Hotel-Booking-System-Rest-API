@@ -2,6 +2,7 @@ package com.staywell.model;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.staywell.enums.ReservationStatus;
 
 import jakarta.persistence.Embedded;
@@ -37,6 +38,7 @@ public class Reservation {
 	@ManyToOne
 	private Room room;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Hotel hotel;
 	
