@@ -1,6 +1,6 @@
 package com.staywell.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.staywell.dto.RoomDTO;
+import com.staywell.exception.HotelException;
 import com.staywell.exception.RoomException;
+import com.staywell.model.Address;
+import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
 import com.staywell.model.Reservation;
 import com.staywell.model.Room;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
+import com.staywell.repository.ReservationDao;
 import com.staywell.repository.RoomDao;
 
 public class RoomServiceImpl implements RoomService{
@@ -27,6 +31,9 @@ public class RoomServiceImpl implements RoomService{
 	
 	@Autowired
 	private RoomDao roomDao;
+	
+	@Autowired
+	private ReservationDao reservationDao;
 	
 	@Override
 	public Room addRoom(Room room) throws RoomException {
@@ -91,6 +98,8 @@ public class RoomServiceImpl implements RoomService{
 		Hotel hotel = hotelDao.findByHotelEmail(email).get();
 		
 		Room room = null;
+		
+		/*Checking if provided room is exits or not*/
 		List<Room> rooms = hotel.getRooms();
 		for(Room r : rooms) {
 			if(r.getRoomNumber() == roomNo) {
@@ -104,6 +113,8 @@ public class RoomServiceImpl implements RoomService{
 		}
 		
 		List<Reservation> reservations = hotel.getReservations();
+		
+		/*Checking if there is any pending reservation of this room*/
 		for(Reservation r : reservations) {
 			if(r.getRoom().getRoomNumber() == roomNo && !r.getStatus().toString().equals("CLOSED")) {
 				room.setAvailable(false);
@@ -112,6 +123,18 @@ public class RoomServiceImpl implements RoomService{
 			}
 		}
 		
+		/*Removing reference of room from every reservation of this room
+		 *  to avoid deleting reservation with room due to cascade ALL*/
+		for(Reservation r : reservations) {
+			r.setRoom(null);
+			reservationDao.save(r);
+		}
+		
+		/*Removing reference of room from hotel to avoid deleting hotel with room due to cascade ALL*/
+		rooms.remove(room);
+		hotel.setRooms(rooms);
+		hotelDao.save(hotel);
+		
 		roomDao.delete(room);
 		
 		return "Room removed successfully";
@@ -119,7 +142,7 @@ public class RoomServiceImpl implements RoomService{
 	}
 
 	@Override
-	public List<Room> getAllAvailableRoomsByHotelId(Integer hotelId, LocalDateTime checkIn, LocalDateTime checkOut) {
+	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut) throws RoomException {
 		
 		Optional<Hotel> opt = hotelDao.findByHotelId(hotelId);
 		if(opt.isEmpty()) {
@@ -128,12 +151,18 @@ public class RoomServiceImpl implements RoomService{
 		
 		Hotel  hotel = opt.get();
 		
+		/*Getting all rooms and filtering if available*/
 		List<Room> rooms = hotel.getRooms().stream().filter(h -> h.getAvailable()).collect(Collectors.toList());
+		
+		/*Filtering out closed reservations out of all reservation of that hotel*/
 		List<Reservation> reservations = hotel.getReservations().stream().filter((r) -> !r.getStatus().toString().equals("CLOSED")).collect(Collectors.toList());
 		
+		/*Filtering out rooms that are not available for the provided dates*/
 		for(Reservation r : reservations) {
 			for(Room room : rooms) {
 				if((room.getRoomId()==r.getRoom().getRoomId()) &&
+						(checkIn.isEqual(r.getCheckinDate()) || checkIn.isEqual(r.getCheckinDate())) ||
+						(checkOut.isEqual(r.getCheckinDate()) || checkOut.isEqual(r.getCheckinDate())) ||
 						(checkIn.isAfter(r.getCheckinDate()) && checkIn.isBefore(r.getCheckinDate())) ||
 						(checkOut.isAfter(r.getCheckinDate()) && checkOut.isBefore(r.getCheckinDate()))
 						) {
@@ -149,16 +178,24 @@ public class RoomServiceImpl implements RoomService{
 	}
 
 	@Override
-	public List<Room> getAvailableRoomsNearMe(LocalDateTime checkIn, LocalDateTime checkOut) {
+	public List<Hotel> getHotelsNearMe() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		Customer customer = customerDao.findByEmail(email).get();
 		
-		return null;
+		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
+		
+		return hotels;
 		
 	}
 
 	@Override
-	public List<Room> getAvailableRoomsInCity(String city, LocalDateTime checkIn, LocalDateTime checkOut) {
+	public List<Hotel> getHotelsInCity(String city) {
+		Address address = new Address();
+		address.setCity(city);
 		
-		return null;
+		List<Hotel> hotels = hotelDao.findByAddress(address);
+		
+		return hotels;
 		
 	}
 

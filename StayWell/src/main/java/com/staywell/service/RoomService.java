@@ -1,10 +1,11 @@
 package com.staywell.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.staywell.dto.RoomDTO;
 import com.staywell.exception.RoomException;
+import com.staywell.model.Hotel;
 import com.staywell.model.Room;
 
 public interface RoomService {
@@ -15,10 +16,10 @@ public interface RoomService {
 	
 	public String removeRoom(Integer roomNo) throws RoomException;
 	
-	public List<Room> getAllAvailableRoomsByHotelId(Integer hotelId, LocalDateTime checkIn, LocalDateTime checkOut);
+	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut) throws RoomException;
 	
-	public List<Room> getAvailableRoomsNearMe(LocalDateTime checkIn, LocalDateTime checkOut);
+	public List<Hotel> getHotelsNearMe();
 	
-	public List<Room> getAvailableRoomsInCity(String city, LocalDateTime checkIn, LocalDateTime checkOut);
+	public List<Hotel> getHotelsInCity(String city);
 	
 }

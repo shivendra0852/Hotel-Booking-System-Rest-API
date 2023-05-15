@@ -5,6 +5,7 @@ import java.util.List;
 import com.staywell.enums.HotelType;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -43,9 +44,12 @@ public class Hotel {
 	@NotNull
 	@NotEmpty
 	private String password;
+	
 	@NotNull
 	@NotEmpty
+	@Embedded
 	private Address hotel_address;
+	
 	private String role;
 	
 	@Enumerated(EnumType.STRING)
@@ -60,8 +64,5 @@ public class Hotel {
 	
 	@OneToMany(mappedBy = "hotel")
 	private List<Feedback> feedbacks;
-
-	
-	
 	
 }
