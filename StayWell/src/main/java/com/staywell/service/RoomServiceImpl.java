@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.staywell.dto.RoomDTO;
+import com.staywell.exception.HotelException;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Hotel;
 import com.staywell.model.Reservation;
@@ -119,9 +120,9 @@ public class RoomServiceImpl implements RoomService{
 	}
 
 	@Override
-	public List<Room> getAllAvailableRoomsByHotelId(Integer hotelId, LocalDateTime checkIn, LocalDateTime checkOut) {
+	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDateTime checkIn, LocalDateTime checkOut) {
 		
-		Optional<Hotel> opt = hotelDao.findByHotelId(hotelId);
+		Optional<Hotel> opt = hotelDao.findById(hotelId);
 		if(opt.isEmpty()) {
 			throw new HotelException("Hotel not found with id : " + hotelId);
 		}

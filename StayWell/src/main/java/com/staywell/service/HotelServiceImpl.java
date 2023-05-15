@@ -1,6 +1,10 @@
 package com.staywell.service;
 
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,7 @@ import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.exception.HotelException;
 import com.staywell.model.Hotel;
+import com.staywell.model.Reservation;
 import com.staywell.repository.HotelDao;
 
 import jakarta.validation.ValidationException;
@@ -94,8 +99,21 @@ public class HotelServiceImpl implements HotelService{
 
 	@Override
 	public boolean deactivateHotelAccount() {
-	  hotelRepo.deleteById(hotelId);
-	  return true;
+		/*find hotel by id*/
+		Hotel hotel = hotelRepo.findById(hotelId).get();
+		
+		List<Reservation> activeOrBookedReservations = new ArrayList<>();
+		/*find reservations who are booked for future / currently active*/
+		for(Reservation reservation:hotel.getReservations()) {
+			if(reservation.getCheckinDate().isAfter(LocalDate.now())) activeOrBookedReservations.add(reservation);
+		}
+		
+		/*If there is no reservations found which are booked then delete hotel and return true*/
+		if(activeOrBookedReservations.size() == 0) {
+			hotelRepo.deleteById(hotelId);
+			return true;
+		}
+		throw new HotelException("Hotel "+hotel.getName()+" has reservations booked for future please serve/cancel those reservations before deleting account");
 	}
 	
 	

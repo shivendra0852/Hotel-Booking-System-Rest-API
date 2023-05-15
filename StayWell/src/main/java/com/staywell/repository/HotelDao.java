@@ -1,5 +1,6 @@
 package com.staywell.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.staywell.model.Hotel;
+import com.staywell.model.Reservation;
 
 public interface HotelDao extends JpaRepository<Hotel, Long>{
 
@@ -27,4 +29,5 @@ public interface HotelDao extends JpaRepository<Hotel, Long>{
 	@Modifying
 	@Query("update Hotel set name?=2 where hotelId=?1")
     Hotel setNameOfHotel(Long id, String name);
+
 }

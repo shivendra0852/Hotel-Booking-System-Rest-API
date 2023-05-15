@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.staywell.enums.HotelType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 public class Hotel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer hotelId;
+	private Long id;
 	@NotNull
 	@NotEmpty
 	private String name;
@@ -52,13 +53,13 @@ public class Hotel {
 	private HotelType hotelType;
 	private List<String> amenities;
 	
-	@OneToMany(mappedBy = "hotel")
+	@OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
 	private List<Room> rooms;
 	
 	@OneToMany(mappedBy = "hotel")
 	private List<Reservation> reservations;
 	
-	@OneToMany(mappedBy = "hotel")
+	@OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
 	private List<Feedback> feedbacks;
 
 	

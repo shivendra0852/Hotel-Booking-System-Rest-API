@@ -15,7 +15,7 @@ public interface RoomService {
 	
 	public String removeRoom(Integer roomNo) throws RoomException;
 	
-	public List<Room> getAllAvailableRoomsByHotelId(Integer hotelId, LocalDateTime checkIn, LocalDateTime checkOut);
+	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDateTime checkIn, LocalDateTime checkOut);
 	
 	public List<Room> getAvailableRoomsNearMe(LocalDateTime checkIn, LocalDateTime checkOut);
 	

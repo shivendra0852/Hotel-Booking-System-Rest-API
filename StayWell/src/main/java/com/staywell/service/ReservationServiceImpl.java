@@ -123,7 +123,7 @@ public class ReservationServiceImpl implements ReservationService {
 				throw new ReservationException("No reservations found.");
 			} else {
 				for(Reservation r:reservations) {
-					if(r.getRoom().getHotel().getHotelId()==hotel.getHotelId()) {
+					if(r.getRoom().getHotel().getId()==hotel.getId()) {
 						result.add(r);
 					}
 				}
