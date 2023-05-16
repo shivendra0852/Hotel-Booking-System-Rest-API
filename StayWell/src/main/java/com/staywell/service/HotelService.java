@@ -3,6 +3,7 @@ package com.staywell.service;
 import java.util.List;
 
 import com.staywell.dto.HotelDTO;
+import com.staywell.dto.UpdateHotelDetailsDTO;
 import com.staywell.model.Hotel;
 
 public interface HotelService {
@@ -11,13 +12,13 @@ public interface HotelService {
 	
 	public Hotel getHotelById(Long id);
 	
-	public Hotel updateEmail(String email);
+	public Hotel updateEmail(UpdateHotelDetailsDTO updateRequest);
 	
-	public Hotel updateName(String name);
+	public Hotel updateName(UpdateHotelDetailsDTO updateRequest);
 	
-	public Hotel updatePhone(String phone);
+	public Hotel updatePhone(UpdateHotelDetailsDTO updateRequest);
 	
-	public Hotel updateTelephone(String telephone);
+	public Hotel updateTelephone(UpdateHotelDetailsDTO updateRequest);
 	
 	public boolean deactivateHotelAccount();
 	

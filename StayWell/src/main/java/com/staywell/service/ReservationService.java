@@ -19,5 +19,6 @@ public interface ReservationService {
 	public Reservation getReservationById(Integer ReservationId) throws ReservationException;
 	
 	public List<Reservation> getReservationByCustomerId(Integer CustomerId) throws ReservationException;
+
 	
 }

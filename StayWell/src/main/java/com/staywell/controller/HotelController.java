@@ -8,10 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.staywell.dto.HotelDTO;
+import com.staywell.dto.UpdateHotelDetailsDTO;
 import com.staywell.model.Hotel;
 import com.staywell.service.HotelService;
 
@@ -32,22 +34,22 @@ public class HotelController {
 	public ResponseEntity<Hotel> getHotelById(@PathVariable("hotelId") long hotelId){
 		return new ResponseEntity<Hotel>(hotelService.getHotelById(hotelId), HttpStatus.FOUND);
 	}
-	@GetMapping("/update/{name}")
-	public ResponseEntity<Hotel> updateName(@PathVariable("name") String name){
-		return new ResponseEntity<Hotel>(hotelService.updateName(name), HttpStatus.ACCEPTED);
+	@GetMapping("/update-name")
+	public ResponseEntity<Hotel> updateName(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+		return new ResponseEntity<Hotel>(hotelService.updateName(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	
-	@GetMapping("/update/{email}")
-	public ResponseEntity<Hotel> updateEmail(@PathVariable("email") String email){
-		return new ResponseEntity<Hotel>(hotelService.updateEmail(email), HttpStatus.ACCEPTED);
+	@GetMapping("/update-email")
+	public ResponseEntity<Hotel> updateEmail(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+		return new ResponseEntity<Hotel>(hotelService.updateEmail(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
-	@GetMapping("/update/{phone}")
-	public ResponseEntity<Hotel> updatePhone(@PathVariable("phone") String phone){
-		return new ResponseEntity<Hotel>(hotelService.updatePhone(phone), HttpStatus.ACCEPTED);
+	@GetMapping("/update-phone")
+	public ResponseEntity<Hotel> updatePhone(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+		return new ResponseEntity<Hotel>(hotelService.updatePhone(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
-	@GetMapping("/update/{telephone}")
-	public ResponseEntity<Hotel> updateTelephone(@PathVariable("telephone") String telephone){
-		return new ResponseEntity<Hotel>(hotelService.updateTelephone(telephone), HttpStatus.ACCEPTED);
+	@GetMapping("/update-telephone")
+	public ResponseEntity<Hotel> updateTelephone(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+		return new ResponseEntity<Hotel>(hotelService.updateTelephone(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	
 	@GetMapping("near-me")

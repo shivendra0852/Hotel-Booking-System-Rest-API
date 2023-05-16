@@ -7,16 +7,20 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.staywell.dto.HotelDTO;
+import com.staywell.dto.UpdateHotelDetailsDTO;
 import com.staywell.enums.Role;
 import com.staywell.exception.HotelException;
 import com.staywell.model.Address;
 import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
+import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
+import com.staywell.repository.ReservationDao;
 
 import jakarta.validation.ValidationException;
 
@@ -30,14 +34,17 @@ public class HotelServiceImpl implements HotelService{
 	@Autowired
 	private CustomerDao customerDao;
 	
-	private Long hotelId = null;/*Extract id of the current logged in hotel from spring security context holder*/
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private ReservationDao reservationDao;
+	
+	private Hotel hotel = LoggedInUser.getHotel();/*Extract id of the current logged in hotel from spring security context holder*/
 	
 	@Override
 	public Hotel registerHotel(HotelDTO hotelRequest) {
-		
-		/*Validating password under some constraints*/
-		if(!passwordValidation(hotelRequest.getPassword())) throw new ValidationException("Password is not valid!");
-		
+
 		/*Checking if there exist a user or a hotel with the provided email*/
 		if(ifEmailExists(hotelRequest.getEmail())) throw new HotelException("This email is already registered, Please use some other email to register.");
 		
@@ -47,7 +54,7 @@ public class HotelServiceImpl implements HotelService{
 		hotel.setHotelEmail(hotelRequest.getEmail());
 		hotel.setHotelPhone(hotelRequest.getPhone());
 		hotel.setHotelTelephone(hotelRequest.getTelephone());
-		hotel.setPassword(encryptPassword(hotelRequest.getPassword()));
+		hotel.setPassword(passwordEncoder.encode(hotelRequest.getPassword()));
 		hotel.setHotelType(hotelRequest.getType());
 		hotel.setRole(Role.HOTEL.toString());
 		hotel.setAddress(hotelRequest.getAddress());
@@ -58,16 +65,6 @@ public class HotelServiceImpl implements HotelService{
 	}
 	
 	
-	private boolean passwordValidation(String password) {		
-		String pattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
-		return password.matches(pattern);
-	}
-
-	
-	/*Password encoder*/
-	private String encryptPassword(String password) {
-		return new BCryptPasswordEncoder().encode(password);
-	}
 
 	@Override
 	public Hotel getHotelById(Long id) {
@@ -77,34 +74,14 @@ public class HotelServiceImpl implements HotelService{
 	}
 
 
-	@Override
-	public Hotel updateEmail(String email) {
-		return hotelDao.setEmailOfHotel(hotelId, email);
-	}
-
-
-	@Override
-	public Hotel updateName(String name) {
-       return hotelDao.setNameOfHotel(hotelId, name);
-	}
-
-
-	@Override
-	public Hotel updatePhone(String phone) {
-		return hotelDao.setPhoneOfHotel(hotelId, phone);
-	}
-
-
-	@Override
-	public Hotel updateTelephone(String telephone) {
-		return hotelDao.setTelephoneOfHotel(hotelId, telephone);
-	}
 
 
 	@Override
 	public boolean deactivateHotelAccount() {
-	  hotelDao.deleteById(hotelId);
-	  return true;
+		reservationDao.updateReservationStatus(hotel);
+		List<Reservation> reservation = reservationDao.getAllPendingReservations(hotel);
+	    if(reservation.size() == 0) hotelDao.delete(hotel);
+	    throw new HotelException("Hotel "+hotel.getName()+" has reservations booked for future please serve/cancel those reservations before deleting account");
 	}
 	
 	@Override
@@ -125,6 +102,39 @@ public class HotelServiceImpl implements HotelService{
 	
 	private boolean ifEmailExists(String email) {
 		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
+	}
+
+
+	@Override
+	public Hotel updateEmail(UpdateHotelDetailsDTO updateRequest) {
+		// TODO Auto-generated method stub
+		String password = passwordEncoder.encode(updateRequest.getPassword());
+		if(!hotel.getPassword().equals(password)) throw new HotelException("Wrong credentials!");
+		return hotelDao.setEmailOfHotel(hotel.getHotelId(), updateRequest.getField());
+	}
+
+
+	@Override
+	public Hotel updateName(UpdateHotelDetailsDTO updateRequest) {
+		String password = passwordEncoder.encode(updateRequest.getPassword());
+		if(!hotel.getPassword().equals(password)) throw new HotelException("Wrong credentials!");
+		return hotelDao.setNameOfHotel(hotel.getHotelId(), updateRequest.getField());
+	}
+
+
+	@Override
+	public Hotel updatePhone(UpdateHotelDetailsDTO updateRequest) {
+		String password = passwordEncoder.encode(updateRequest.getPassword());
+		if(!hotel.getPassword().equals(password)) throw new HotelException("Wrong credentials!");
+		return hotelDao.setPhoneOfHotel(hotel.getHotelId(), updateRequest.getField());
+	}
+
+
+	@Override
+	public Hotel updateTelephone(UpdateHotelDetailsDTO updateRequest) {
+		String password = passwordEncoder.encode(updateRequest.getPassword());
+		if(!hotel.getPassword().equals(password)) throw new HotelException("Wrong credentials!");
+		return hotelDao.setTelephoneOfHotel(hotel.getHotelId(), updateRequest.getField());
 	}
 
 }

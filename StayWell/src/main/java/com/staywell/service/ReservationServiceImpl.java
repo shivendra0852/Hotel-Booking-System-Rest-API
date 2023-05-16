@@ -1,5 +1,6 @@
 package com.staywell.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.staywell.dto.ReservationDTO;
+import com.staywell.enums.ReservationStatus;
 import com.staywell.exception.ReservationException;
 import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
@@ -28,6 +30,7 @@ public class ReservationServiceImpl implements ReservationService {
 	
 	@Autowired
 	private HotelDao hotelDao;
+	
 	
 	@Override
 	public Reservation createReservation(Reservation reservation) throws ReservationException {

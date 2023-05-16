@@ -1,9 +1,7 @@
 package com.staywell.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.staywell.enums.HotelType;
 
 import jakarta.persistence.Column;
@@ -18,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +44,7 @@ public class Hotel {
 	private String hotelTelephone;
 	@NotNull
 	@NotEmpty
+	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\\\S+$).{8,}")
 	private String password;
 	
 	@NotNull
@@ -56,19 +56,14 @@ public class Hotel {
 	
 	@Enumerated(EnumType.STRING)
 	private HotelType hotelType;
+	private List<String> amenities;
 	
-	
-	private List<String> amenities = new ArrayList<>();
-	
-	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
-	private List<Room> rooms = new ArrayList<>();
+	private List<Room> rooms;
 	
-	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
-	private List<Reservation> reservations = new ArrayList<>();
+	private List<Reservation> reservations;
 	
-	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
 	private List<Feedback> feedbacks;
 	
