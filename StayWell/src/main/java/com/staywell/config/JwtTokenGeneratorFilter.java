@@ -1,7 +1,8 @@
 package com.staywell.config;
 
-
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,10 +24,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
 
+    private static final int EXPIRATION_TIME_MINUTES = 30;
+    private static final String ISSUER = "IP";
+    private static final String SUBJECT = "JWT Token";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -34,12 +38,12 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
             SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
 
             String jwt = Jwts.builder()
-                    .setIssuer("IP")
-                    .setSubject("JWT Token")
+                    .setIssuer(ISSUER)
+                    .setSubject(SUBJECT)
                     .claim("username", authentication.getName())
                     .claim("authorities", populateAuthorities(authentication.getAuthorities()))
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(new Date().getTime() + 30000000))
+                    .setIssuedAt(Date.from(Instant.now()))
+                    .setExpiration(Date.from(Instant.now().plus(EXPIRATION_TIME_MINUTES, ChronoUnit.MINUTES)))
                     .signWith(key).compact();
 
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);

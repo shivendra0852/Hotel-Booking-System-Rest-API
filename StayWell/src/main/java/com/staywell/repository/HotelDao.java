@@ -27,7 +27,7 @@ public interface HotelDao extends JpaRepository<Hotel, Long>{
 	Hotel setTelephoneOfHotel(Long id, String telephone);
  
 	@Modifying
-	@Query("update Hotel set name?=2 where hotelId=?1")
+	@Query("update Hotel set name=?2 where hotelId=?1")
     Hotel setNameOfHotel(Long id, String name);
 	
 	/*Overridden equals and hash code on city field*/

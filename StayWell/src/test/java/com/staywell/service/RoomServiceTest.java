@@ -83,7 +83,7 @@ public class RoomServiceTest {
 		feedbacks = new ArrayList<>();
 		rooms.add(new Room(1001, 1, "AC", 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
-		hotel = new Hotel(1, "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
+		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
 				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
 	}
 

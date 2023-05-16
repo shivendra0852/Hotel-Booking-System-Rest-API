@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import com.staywell.dto.RoomDTO;
 import com.staywell.exception.HotelException;
@@ -18,6 +19,7 @@ import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
 import com.staywell.repository.RoomDao;
 
+@Service
 public class RoomServiceImpl implements RoomService{
 	
 	@Autowired

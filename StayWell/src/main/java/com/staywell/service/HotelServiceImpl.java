@@ -50,7 +50,7 @@ public class HotelServiceImpl implements HotelService{
 		hotel.setPassword(encryptPassword(hotelRequest.getPassword()));
 		hotel.setHotelType(hotelRequest.getType());
 		hotel.setRole(Role.HOTEL.toString());
-		hotel.setHotel_address(hotelRequest.getAddress());
+		hotel.setAddress(hotelRequest.getAddress());
 		
 		
 		/*Saving to the database*/
