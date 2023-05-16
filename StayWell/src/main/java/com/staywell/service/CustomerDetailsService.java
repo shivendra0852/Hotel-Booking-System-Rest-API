@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import com.staywell.model.Admin;
 import com.staywell.model.Customer;
@@ -19,6 +20,7 @@ import com.staywell.repository.AdminDao;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 
+@Service
 public class CustomerDetailsService implements UserDetailsService{
 	
 	@Autowired

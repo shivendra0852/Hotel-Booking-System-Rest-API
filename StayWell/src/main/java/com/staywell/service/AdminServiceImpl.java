@@ -8,11 +8,12 @@ import org.springframework.stereotype.Service;
 
 import com.staywell.enums.Role;
 import com.staywell.exception.AdminException;
+import com.staywell.exception.AuthenticationException;
 import com.staywell.model.Admin;
 import com.staywell.repository.AdminDao;
 
 @Service
-public class AdminServiceImpl implements AdminService{
+public class AdminServiceImpl implements AdminService,LoginService{
 
 	@Autowired
 	private AdminDao aDao;
@@ -36,6 +37,14 @@ public class AdminServiceImpl implements AdminService{
 	    admin.setRole(Role.ADMIN);
 	    
 	    return aDao.save(admin);
+	}
+
+
+
+	@Override
+	public String login(String email, String password) throws AuthenticationException {
+		
+		return null;
 	}
 
 }

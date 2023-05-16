@@ -2,8 +2,10 @@ package com.staywell.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.staywell.enums.Gender;
 
 import jakarta.persistence.Column;
@@ -39,7 +41,9 @@ public class Customer {
 	@Embedded
 	private Address address;
 	private String role;
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "customer")
-	private List<Reservation> reservations;
+	private List<Reservation> reservations = new ArrayList<>();
 	private LocalDateTime registrationDateTime;
 }

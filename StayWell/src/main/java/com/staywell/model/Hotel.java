@@ -1,7 +1,9 @@
 package com.staywell.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.staywell.enums.HotelType;
 
 import jakarta.persistence.Column;
@@ -48,20 +50,25 @@ public class Hotel {
 	@NotNull
 	@NotEmpty
 	@Embedded
-	private Address hotel_address;
+	private Address address;
 	
 	private String role;
 	
 	@Enumerated(EnumType.STRING)
 	private HotelType hotelType;
-	private List<String> amenities;
 	
+	
+	private List<String> amenities = new ArrayList<>();
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
-	private List<Room> rooms;
+	private List<Room> rooms = new ArrayList<>();
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
-	private List<Reservation> reservations;
+	private List<Reservation> reservations = new ArrayList<>();
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
 	private List<Feedback> feedbacks;
 	
