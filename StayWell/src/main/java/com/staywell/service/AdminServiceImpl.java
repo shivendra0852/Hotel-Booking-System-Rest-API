@@ -13,6 +13,7 @@ import com.staywell.repository.AdminDao;
 
 @Service
 public class AdminServiceImpl implements AdminService{
+
 	@Autowired
 	private AdminDao aDao;
 	

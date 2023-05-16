@@ -11,20 +11,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.staywell.dto.RoomDTO;
 import com.staywell.exception.HotelException;
 import com.staywell.exception.RoomException;
-import com.staywell.model.Address;
-import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
 import com.staywell.model.Reservation;
 import com.staywell.model.Room;
-import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
 import com.staywell.repository.RoomDao;
 
 public class RoomServiceImpl implements RoomService{
-
-	@Autowired
-	private CustomerDao customerDao;
 	
 	@Autowired
 	private HotelDao hotelDao;
@@ -112,11 +106,11 @@ public class RoomServiceImpl implements RoomService{
 			throw new RoomException("Room not found in your hotel with room number : "+ roomNo);
 		}
 		
-		List<Reservation> reservations = hotel.getReservations();
+		List<Reservation> reservations = room.getReservations();
 		
 		/*Checking if there is any pending reservation of this room*/
 		for(Reservation r : reservations) {
-			if(r.getRoom().getRoomNumber() == roomNo && !r.getStatus().toString().equals("CLOSED")) {
+			if(!r.getStatus().toString().equals("CLOSED")) {
 				room.setAvailable(false);
 				roomDao.save(room);
 				throw new RoomException("Booked Room can't be removed, but it is set to not available for future bookings");
@@ -174,28 +168,6 @@ public class RoomServiceImpl implements RoomService{
 		if(rooms.isEmpty()) throw new RoomException("Rooms not found in this hotel");
 		
 		return rooms;
-		
-	}
-
-	@Override
-	public List<Hotel> getHotelsNearMe() {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Customer customer = customerDao.findByEmail(email).get();
-		
-		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
-		
-		return hotels;
-		
-	}
-
-	@Override
-	public List<Hotel> getHotelsInCity(String city) {
-		Address address = new Address();
-		address.setCity(city);
-		
-		List<Hotel> hotels = hotelDao.findByAddress(address);
-		
-		return hotels;
 		
 	}
 

@@ -1,11 +1,10 @@
 package com.staywell.service;
 
+import java.util.List;
+
 import com.staywell.dto.CustomerDTO;
 import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
-import org.hibernate.collection.internal.CustomCollectionTypeSemantics;
-
-import java.util.List;
 
 public interface CustomerService {
 
