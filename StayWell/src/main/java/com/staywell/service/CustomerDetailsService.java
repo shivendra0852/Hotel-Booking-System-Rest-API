@@ -48,13 +48,13 @@ public class CustomerDetailsService implements UserDetailsService{
 		
 		if(customerOptional.isPresent()) {
 			Customer customer = customerOptional.get();
-			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(adminOptional.get().getRole().toString());
+			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(customerOptional.get().getRole().toString());
 			authorities.add(sga);
 			return new User(customer.getEmail(), customer.getPassword(), authorities);
 			
 		} else if(adminOptional.isPresent()){
 			Admin admin = adminOptional.get();
-			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(customerOptional.get().getRole().toString());
+			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(adminOptional.get().getRole().toString());
 			authorities.add(sga);
 			return new User(admin.getEmail(),admin.getPassword(),authorities);
 		} else {
