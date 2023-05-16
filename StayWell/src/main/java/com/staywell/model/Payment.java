@@ -1,8 +1,5 @@
 package com.staywell.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import com.staywell.enums.PaymentType;
 
 import jakarta.persistence.EnumType;

@@ -1,20 +1,21 @@
 package com.staywell.service;
 
-import com.staywell.dto.CustomerDTO;
-import com.staywell.exception.CustomerException;
-import com.staywell.model.Customer;
-import com.staywell.model.Reservation;
-import com.staywell.repository.CustomerDao;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.staywell.dto.CustomerDTO;
+import com.staywell.exception.CustomerException;
+import com.staywell.model.Customer;
+import com.staywell.model.Reservation;
+import com.staywell.repository.CustomerDao;
 @Service
 public class CustomerServiceImpl implements CustomerService{
 

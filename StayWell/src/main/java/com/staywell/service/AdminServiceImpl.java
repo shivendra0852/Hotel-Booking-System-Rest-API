@@ -4,18 +4,13 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.staywell.config.JwtTokenGeneratorFilter;
 import com.staywell.enums.Role;
 import com.staywell.exception.AdminException;
-import com.staywell.exception.AuthenticationException;
 import com.staywell.model.Admin;
 import com.staywell.repository.AdminDao;
-
-import lombok.Value;
 
 public class AdminServiceImpl implements AdminService,LoginService{
 	@Autowired

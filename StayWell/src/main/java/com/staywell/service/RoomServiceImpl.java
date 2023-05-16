@@ -106,11 +106,11 @@ public class RoomServiceImpl implements RoomService{
 			throw new RoomException("Room not found in your hotel with room number : "+ roomNo);
 		}
 		
-		List<Reservation> reservations = hotel.getReservations();
+		List<Reservation> reservations = room.getReservations();
 		
 		/*Checking if there is any pending reservation of this room*/
 		for(Reservation r : reservations) {
-			if(r.getRoom().getRoomNumber() == roomNo && !r.getStatus().toString().equals("CLOSED")) {
+			if(!r.getStatus().toString().equals("CLOSED")) {
 				room.setAvailable(false);
 				roomDao.save(room);
 				throw new RoomException("Booked Room can't be removed, but it is set to not available for future bookings");
