@@ -38,6 +38,9 @@ public class HotelServiceImpl implements HotelService{
 		/*Validating password under some constraints*/
 		if(!passwordValidation(hotelRequest.getPassword())) throw new ValidationException("Password is not valid!");
 		
+		/*Checking if there exist a user or a hotel with the provided email*/
+		if(ifEmailExists(hotelRequest.getEmail())) throw new HotelException("This email is already registered, Please use some other email to register.");
+		
 		/*Creating hotel object and mapping attributes from request dto to hotel entity*/
 		Hotel hotel = new Hotel();
 		hotel.setName(hotelRequest.getName());
@@ -108,22 +111,20 @@ public class HotelServiceImpl implements HotelService{
 	public List<Hotel> getHotelsNearMe() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 		Customer customer = customerDao.findByEmail(email).get();
-		
 		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
-		
 		return hotels;
-		
 	}
 
 	@Override
 	public List<Hotel> getHotelsInCity(String city) {
 		Address address = new Address();
 		address.setCity(city);
-		
 		List<Hotel> hotels = hotelDao.findByAddress(address);
-		
 		return hotels;
-		
+	}
+	
+	private boolean ifEmailExists(String email) {
+		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
 	}
 
 }
