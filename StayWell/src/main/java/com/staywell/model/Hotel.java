@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 public class Hotel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer hotelId;
+	private Long hotelId;
 	@NotNull
 	@NotEmpty
 	private String name;
