@@ -22,6 +22,6 @@ public class AdminController {
 		
 		Admin res = adminService.registerAdmin(admin);
 		
-		return new ResponseEntity<>(res,HttpStatus.CREATED);
+		return new ResponseEntity<Admin>(res,HttpStatus.CREATED);
 	}
 }

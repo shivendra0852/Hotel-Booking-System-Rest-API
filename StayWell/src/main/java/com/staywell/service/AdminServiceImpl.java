@@ -13,7 +13,7 @@ import com.staywell.model.Admin;
 import com.staywell.repository.AdminDao;
 
 @Service
-public class AdminServiceImpl implements AdminService,LoginService{
+public class AdminServiceImpl implements AdminService{
 
 	@Autowired
 	private AdminDao aDao;
@@ -34,17 +34,7 @@ public class AdminServiceImpl implements AdminService,LoginService{
 		String hashedPassword = passwordEncoder.encode(admin.getPassword());
 	    admin.setPassword(hashedPassword);
 	    
-	    admin.setRole(Role.ADMIN);
-	    
 	    return aDao.save(admin);
-	}
-
-
-
-	@Override
-	public String login(String email, String password) throws AuthenticationException {
-		
-		return null;
 	}
 
 }

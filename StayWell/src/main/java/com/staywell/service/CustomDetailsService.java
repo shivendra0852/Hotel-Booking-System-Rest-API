@@ -21,7 +21,7 @@ import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 
 @Service
-public class CustomerDetailsService implements UserDetailsService{
+public class CustomDetailsService implements UserDetailsService{
 	
 	@Autowired
 	private CustomerDao cDao;
