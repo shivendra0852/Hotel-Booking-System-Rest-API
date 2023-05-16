@@ -1,5 +1,7 @@
 package com.staywell.service;
 
+import java.util.List;
+
 import com.staywell.dto.HotelDTO;
 import com.staywell.model.Hotel;
 
@@ -19,5 +21,8 @@ public interface HotelService {
 	
 	public boolean deactivateHotelAccount();
 	
+	public List<Hotel> getHotelsNearMe();
+	
+	public List<Hotel> getHotelsInCity(String city);
 	
 }

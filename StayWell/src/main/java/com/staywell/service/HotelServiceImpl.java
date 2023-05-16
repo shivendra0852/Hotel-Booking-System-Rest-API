@@ -1,6 +1,7 @@
 package com.staywell.service;
 
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.staywell.dto.HotelDTO;
-import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.exception.HotelException;
+import com.staywell.model.Address;
+import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
 import com.staywell.repository.HotelDao;
 
@@ -98,6 +100,26 @@ public class HotelServiceImpl implements HotelService{
 	  return true;
 	}
 	
-	
+	@Override
+	public List<Hotel> getHotelsNearMe() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		Customer customer = customerDao.findByEmail(email).get();
+		
+		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
+		
+		return hotels;
+		
+	}
+
+	@Override
+	public List<Hotel> getHotelsInCity(String city) {
+		Address address = new Address();
+		address.setCity(city);
+		
+		List<Hotel> hotels = hotelDao.findByAddress(address);
+		
+		return hotels;
+		
+	}
 
 }
