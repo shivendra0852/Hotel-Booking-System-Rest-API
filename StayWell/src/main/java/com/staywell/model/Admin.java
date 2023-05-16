@@ -1,6 +1,6 @@
 package com.staywell.model;
 
-import com.staywell.enums.Role;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,11 +16,11 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Admin {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer adminId;
 	private String name;
 	private String email;
 	private String mobile;
 	private String password;
-	private Role role;
+	private String role;
 }
