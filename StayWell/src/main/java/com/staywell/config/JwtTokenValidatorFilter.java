@@ -1,66 +1,62 @@
 package com.staywell.config;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+
+import java.io.IOException;
+import java.security.Key;
+
+@Component
 public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-	
-		String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
-		
-		if (jwt != null) {
-			try {
-		
-				jwt = jwt.substring(7);
-				
-				SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
-				
-				Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-				
-				String username = String.valueOf(claims.get("username"));
-				
-				String role = (String) claims.get("role");
-				
-				List<GrantedAuthority> authorities = new ArrayList<>();
-				authorities.add(new SimpleGrantedAuthority(role));
-				
-				Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
-				
-				SecurityContextHolder.getContext().setAuthentication(auth);
-			} catch (Exception e) {
-				throw new BadCredentialsException("Invalid Token received.");
-			}
-		}
-		
-		filterChain.doFilter(request, response);
-	}
-	
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		String path = request.getServletPath();
-        return path.equals("/staywell/admin/login") && path.equals("/staywell/customer/login") && path.equals("/staywell/hotel/login");
-	}
+    @Value("${jwt.secretKey}")
+    private String jwtSecretKey;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String authorizationHeader = request.getHeader(SecurityConstants.JWT_HEADER);
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                String token = authorizationHeader.substring(7);
+
+                Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+                Jws<Claims> claimsJws = Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(token);
+
+                Claims body = claimsJws.getBody();
+                String username = body.getSubject();
+
+                // You can perform further validation or processing here
+                // and set additional details in the request if needed.
+
+                request.setAttribute("username", username);
+            } catch (Exception e) {
+                // Token validation failed
+                // You can handle the exception according to your application's requirements.
+                // For example, you can send a custom error response or redirect the user to a login page.
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                return;
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
 }

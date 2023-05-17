@@ -12,34 +12,32 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration
 public class AppConfig {
+
 	@Bean
-	public SecurityFilterChain springSecurityConfiguration(HttpSecurity http) throws Exception {
-
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and()
-		.csrf().disable()
-		.authorizeHttpRequests()
-		.requestMatchers(HttpMethod.POST, "/customer/register").permitAll()
-		.requestMatchers(HttpMethod.POST, "/admin/register").permitAll()
-		.requestMatchers(HttpMethod.POST, "/staywell/hotels/register").permitAll()
-		.requestMatchers(HttpMethod.POST, "/staywell/rooms/add").hasRole("HOTEL")
-		.requestMatchers(HttpMethod.POST, "/customer/delete").hasRole("CUSTOMER")
-		.anyRequest().authenticated().and()
-		.addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-		.addFilterBefore(new JwtTokenValidatorFilter(), BasicAuthenticationFilter.class)
-		.formLogin()
-		.and()
-		.httpBasic();
-		return http.build();
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			.and()
+			.csrf().disable()
+			.authorizeHttpRequests()
+				.requestMatchers(HttpMethod.POST, "/customer/register").permitAll()
+				.requestMatchers(HttpMethod.POST, "/admin/register").permitAll()
+				.requestMatchers(HttpMethod.POST, "/staywell/hotels/register").permitAll()
+				.requestMatchers(HttpMethod.POST, "/staywell/rooms/add").hasRole("HOTEL")
+				.requestMatchers(HttpMethod.POST, "/customer/delete").hasRole("CUSTOMER")
+				.anyRequest().authenticated()
+			.and()
+			.addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+			.addFilterBefore(new JwtTokenValidatorFilter(), BasicAuthenticationFilter.class)
+			.formLogin()
+			.and()
+			.httpBasic();
 
+		return http.build();
 	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-
-        return new BCryptPasswordEncoder();
-
-    }
-
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

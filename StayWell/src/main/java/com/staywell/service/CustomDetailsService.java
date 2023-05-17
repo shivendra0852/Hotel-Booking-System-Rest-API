@@ -21,51 +21,47 @@ import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 
 @Service
-public class CustomDetailsService implements UserDetailsService{
-	
+public class CustomDetailsService implements UserDetailsService {
+
 	@Autowired
 	private CustomerDao cDao;
-	
+
 	@Autowired
 	private AdminDao aDao;
-	
+
 	@Autowired
 	private HotelDao hDao;
-	
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		Optional<Customer> customerOptional = cDao.findByEmail(email);
-		
+
 		Optional<Admin> adminOptional = aDao.findByEmail(email);
-		
+
 		Optional<Hotel> hotelOptional = hDao.findByHotelEmail(email);
 
-		if (customerOptional.isEmpty() && adminOptional.isEmpty() && hotelOptional.isEmpty()) {
-		    throw new UsernameNotFoundException("Invalid credentials");
+		if (!customerOptional.isPresent() && !adminOptional.isPresent() && !hotelOptional.isPresent()) {
+			throw new UsernameNotFoundException("User with email " + email + " not found");
 		}
 
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		
-		
-		if(customerOptional.isPresent()) {
+
+		if (customerOptional.isPresent()) {
 			Customer customer = customerOptional.get();
-			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(customerOptional.get().getRole().toString());
+			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(customer.getRole().toString());
 			authorities.add(sga);
 			return new User(customer.getEmail(), customer.getPassword(), authorities);
-			
-		} else if(adminOptional.isPresent()){
+
+		} else if (adminOptional.isPresent()) {
 			Admin admin = adminOptional.get();
-			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(adminOptional.get().getRole().toString());
+			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(admin.getRole().toString());
 			authorities.add(sga);
-			return new User(admin.getEmail(),admin.getPassword(),authorities);
+			return new User(admin.getEmail(), admin.getPassword(), authorities);
 		} else {
 			Hotel hotel = hotelOptional.get();
-			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(hotelOptional.get().getRole().toString());
+			SimpleGrantedAuthority sga = new SimpleGrantedAuthority(hotel.getRole().toString());
 			authorities.add(sga);
-			return new User(hotel.getHotelEmail(),hotel.getPassword(),authorities);
+			return new User(hotel.getHotelEmail(), hotel.getPassword(), authorities);
 		}
-	
 	}
-
 }
