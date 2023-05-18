@@ -78,30 +78,28 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public Customer deleteCustomer() throws CustomerException {
-
-           Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
-
-           Optional<Customer> customerExist =  cDao.findByEmail(auth.getName());
-
-           Customer customer = customerExist.get();
-
-           if(customerExist.isPresent()){
-
-               List<Reservation> reservations =  customer.getReservations();
-
-               reservations.forEach(el ->{
-
-                   if(!el.getStatus().equals("CLOSED")) throw new CustomerException("Can't delete. Reservation is not closed ");
-               });
-
-               cDao.delete(customer);
-
-               return customer;
-
-
-           }
-           else throw new CustomerException("Customer not exist");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Optional<Customer> customerExist = cDao.findByEmail(auth.getName());
+        
+        if (customerExist.isPresent()) {
+            Customer customer = customerExist.get();
+            List<Reservation> reservations = customer.getReservations();
+            
+            if (!reservations.isEmpty()) {
+                for (Reservation reservation : reservations) {
+                    if (!reservation.getStatus().equals("CLOSED")) {
+                        throw new CustomerException("Can't delete. Reservation is not closed");
+                    }
+                }
+            }
+            
+            cDao.delete(customer);
+            return customer;
+        } else {
+            throw new CustomerException("Customer does not exist");
+        }
     }
+
 
     @Override
     public List<Customer> getAllCustomer() throws CustomerException {
