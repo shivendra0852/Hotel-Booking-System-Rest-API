@@ -15,6 +15,7 @@ import com.staywell.exception.HotelException;
 import com.staywell.model.Address;
 import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
+import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
@@ -67,18 +68,15 @@ public class HotelServiceImpl implements HotelService {
 
 	@Override
 	public boolean deactivateHotelAccount() {
-//		Hotel currentHotel = getCurrentLoggedInHotel();
-//		reservationDao.updateReservationStatus(currentHotel);
-//		List<Reservation> reservations = reservationDao.getAllPendingReservations(currentHotel);
-//		if (reservations.isEmpty()) {
-//			hotelDao.delete(currentHotel);
-//			return true;
-//		} else {
-//			throw new HotelException("Hotel " + currentHotel.getName()
-//					+ " has reservations booked for the future. Please serve/cancel those reservations before deleting the account.");
-//		}
-		
-		return true;
+		Hotel currentHotel = getCurrentLoggedInHotel();
+		reservationDao.updateReservationStatus(currentHotel);
+		List<Reservation> reservations = reservationDao.getAllPendingReservations(currentHotel);
+		if (reservations.isEmpty()) {
+			hotelDao.delete(currentHotel);
+			return true;
+		}
+		throw new HotelException("Hotel " + currentHotel.getName()
+					+ " has reservations booked for the future. Please serve/cancel those reservations before deleting the account.");
 	}
 
 	@Override
