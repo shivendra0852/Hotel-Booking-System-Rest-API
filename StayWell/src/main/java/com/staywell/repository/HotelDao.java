@@ -16,19 +16,19 @@ public interface HotelDao extends JpaRepository<Hotel, Long>{
 	
 	@Modifying
 	@Query("update Hotel set hotelEmail=?2 where hotelId=?1")
-	Hotel setEmailOfHotel(Long id, String email);
+	Integer setEmailOfHotel(Long id, String email);
 
 	@Modifying
 	@Query("update Hotel set hotelPhone=?2 where hotelId=?1")
-	Hotel setPhoneOfHotel(Long id, String phone);
+	Integer setPhoneOfHotel(Long id, String phone);
 
 	@Modifying
 	@Query("update Hotel set hotelTelephone=?2 where hotelId=?1")
-	Hotel setTelephoneOfHotel(Long id, String telephone);
+	Integer setTelephoneOfHotel(Long id, String telephone);
  
 	@Modifying
 	@Query("update Hotel set name=?2 where hotelId=?1")
-    Hotel setNameOfHotel(Long id, String name);
+	Integer setNameOfHotel(Long id, String name);
 	
 	/*Overridden equals and hash code on city field*/
 	List<Hotel> findByAddress(Address address);
