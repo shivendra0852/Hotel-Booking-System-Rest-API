@@ -48,57 +48,60 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public Customer updateCustomer(CustomerDTO customerDto) throws CustomerException {
-
-            Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
-
-            Optional<Customer> customerExist =  cDao.findByEmail(auth.getName());
-
-            Customer customer = customerExist.get();
-
-            if(customerDto.getName() != null) customer.setName(customerDto.getName());
-
-            if(customerDto.getGender() != null) customer.setGender(customerDto.getGender());
-
-            if(customerDto.getDob() != null) customer.setDob(customerDto.getDob());
-
-            if(customerDto.getAddress() != null) customer.setAddress(customerDto.getAddress());
-
-            if(customerDto.getEmail() != null) customer.setEmail(customerDto.getEmail());
-
-            if(customerDto.getPhone() != null ) customer.setPhone(customerDto.getPhone());
-
-            if(customerDto.getPassword() != null) customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
-
-
-            return cDao.save(customer);
-
-
-
-    }
-
-    @Override
-    public Customer deleteCustomer() throws CustomerException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<Customer> customerExist = cDao.findByEmail(auth.getName());
+        String email = auth.getName();
         
+        System.out.println(email);
+
+        Optional<Customer> customerExist = cDao.findByEmail(email);
+
         if (customerExist.isPresent()) {
             Customer customer = customerExist.get();
-            List<Reservation> reservations = customer.getReservations();
-            
-            if (!reservations.isEmpty()) {
-                for (Reservation reservation : reservations) {
-                    if (!reservation.getStatus().equals("CLOSED")) {
-                        throw new CustomerException("Can't delete. Reservation is not closed");
-                    }
-                }
+
+            if (customerDto.getName() != null) {
+                customer.setName(customerDto.getName());
             }
-            
+            if (customerDto.getGender() != null) {
+                customer.setGender(customerDto.getGender());
+            }
+            if (customerDto.getDob() != null) {
+                customer.setDob(customerDto.getDob());
+            }
+            if (customerDto.getAddress() != null) {
+                customer.setAddress(customerDto.getAddress());
+            }
+            if (customerDto.getEmail() != null) {
+                customer.setEmail(customerDto.getEmail());
+            }
+            if (customerDto.getPhone() != null) {
+                customer.setPhone(customerDto.getPhone());
+            }
+            if (customerDto.getPassword() != null) {
+                customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
+            }
+
+            return cDao.save(customer);
+        } else {
+            throw new CustomerException("Customer does not exist");
+        }
+    }
+
+
+    public Customer deleteCustomer(Authentication authentication) throws CustomerException {
+        String email = authentication.getName();
+        Optional<Customer> customerExist = cDao.findByEmail(email);
+
+        if (customerExist.isPresent()) {
+            Customer customer = customerExist.get();
             cDao.delete(customer);
             return customer;
         } else {
             throw new CustomerException("Customer does not exist");
         }
     }
+
+    
+    
 
 
     @Override

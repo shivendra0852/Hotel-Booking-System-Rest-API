@@ -79,6 +79,14 @@
 			<scope>runtime</scope>
 		</dependency>
 		
+		<dependency>
+		    <groupId>com.auth0</groupId>
+		    <artifactId>java-jwt</artifactId>
+		    <version>3.18.2</version>
+		</dependency>
+
+
+		
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
 		<dependency>
 		    <groupId>org.mockito</groupId>

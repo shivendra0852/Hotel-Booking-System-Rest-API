@@ -1,9 +1,8 @@
 package com.staywell.config;
 
 import java.io.IOException;
-import java.security.Key;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,54 +22,72 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
 public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
 
-    private static final int EXPIRATION_TIME_MINUTES = 30;
-    private static final String ISSUER = "IP";
-    private static final String SUBJECT = "JWT Token";
-
-    private final SecretKey secretKey;
-
-    public JwtTokenGeneratorFilter(Key key) {
-        this.secretKey = (SecretKey) key;
-    }
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		
+		System.out.println("inside doFilter....");
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (null != authentication) {
+        	
+        	System.out.println("auth.getAuthorities "+authentication.getAuthorities());
+        	
+        	
+            SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
+            
+            
+            
             String jwt = Jwts.builder()
-                    .setIssuer(ISSUER)
-                    .setSubject(SUBJECT)
+            		.setIssuer("Ratan")
+            		.setSubject("JWT Token")
                     .claim("username", authentication.getName())
                     .claim("authorities", populateAuthorities(authentication.getAuthorities()))
-                    .setIssuedAt(Date.from(Instant.now()))
-                    .setExpiration(Date.from(Instant.now().plus(EXPIRATION_TIME_MINUTES, ChronoUnit.MINUTES)))
-                    .signWith(secretKey).compact();
-
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(new Date().getTime()+ 30000000)) // expiration time of 8 hours
+                    .signWith(key).compact();
+            
+         
+            
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);
+ 
+                   
         }
 
         filterChain.doFilter(request, response);
-    }
+    	
+		
+		
+	}
+	
+	
+	
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> collection) {
-
-        Set<String> authoritiesSet = new HashSet<>();
-
+        
+    	Set<String> authoritiesSet = new HashSet<>();
+        
         for (GrantedAuthority authority : collection) {
             authoritiesSet.add(authority.getAuthority());
         }
-
         return String.join(",", authoritiesSet);
+   
+    
     }
-
+	
+		
+		
+	
+//this make sure that this filter will execute only for first time when client call the api /login at first time
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
         return !path.equals("/staywell/admin/login") && !path.equals("/staywell/customer/login") && !path.equals("/staywell/hotel/login");
     }
+	
+
 }
+

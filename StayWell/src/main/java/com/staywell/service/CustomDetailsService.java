@@ -33,15 +33,15 @@ public class CustomDetailsService implements UserDetailsService {
 	private HotelDao hDao;
 
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Optional<Customer> customerOptional = cDao.findByEmail(email);
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Optional<Customer> customerOptional = cDao.findByEmail(username);
 
-		Optional<Admin> adminOptional = aDao.findByEmail(email);
+		Optional<Admin> adminOptional = aDao.findByEmail(username);
 
-		Optional<Hotel> hotelOptional = hDao.findByHotelEmail(email);
+		Optional<Hotel> hotelOptional = hDao.findByHotelEmail(username);
 
 		if (!customerOptional.isPresent() && !adminOptional.isPresent() && !hotelOptional.isPresent()) {
-			throw new UsernameNotFoundException("User with email " + email + " not found");
+			throw new UsernameNotFoundException("User with email " + username + " not found");
 		}
 
 		List<GrantedAuthority> authorities = new ArrayList<>();
