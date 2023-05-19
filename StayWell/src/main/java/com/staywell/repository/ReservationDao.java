@@ -20,7 +20,7 @@ public interface ReservationDao extends JpaRepository<Reservation, Integer> {
 	@Query("UPDATE Reservation r SET r.status = 'CLOSED' WHERE r.hotel = ?1 AND r.checkoutDate <= CURDATE()")
 	void updateReservationStatus(Hotel hotel);
 
-	@Query("SELECT r FROM Reservation r WHERE r.hotel = ?1 AND r.checkoutDate >= CURRENT_DATE")
+	@Query("SELECT r FROM Reservation r WHERE r.hotel = ?1 AND r.checkoutDate >= CURDATE()")
 	List<Reservation> getAllPendingReservations(Hotel hotel);
 	
 	List<Reservation> findByRoomAndStatus(Room room, ReservationStatus status);
@@ -28,5 +28,6 @@ public interface ReservationDao extends JpaRepository<Reservation, Integer> {
 	List<Reservation> findByHotel(Hotel hotel);
 	
 	List<Reservation> findByHotelAndCustomer(Hotel hotel, Customer customer);
+	
 	
 }
