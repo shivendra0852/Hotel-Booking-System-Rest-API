@@ -3,8 +3,7 @@ package com.staywell.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -57,8 +56,13 @@ public class HotelServiceTest {
 	@Mock
 	private Authentication authentication;
 	
+	@Mock
+	private PasswordEncoder passswordEncoder;
+	
 	@InjectMocks
 	private HotelServiceImpl hotelService;
+	
+	
 	
 	@Test
 	@Order(1)
@@ -75,14 +79,22 @@ public class HotelServiceTest {
 		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
 				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
 		
-		
-		
-		when(customerDao.findByEmail(anyString())).thenReturn(Optional.of(new Customer()));
-		doReturn(Optional.of(new Hotel())).when(hotelDao).findByHotelEmail(anyString());
+        when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.empty());
+		when(customerDao.findByEmail(anyString())).thenReturn(Optional.empty());
 		
 		when(hotelDao.save(any())).thenReturn(dummyHotel);
 		
-		Hotel hotel = hotelService.registerHotel(new HotelDTO());
+		HotelDTO hotelRequest = new HotelDTO();
+		hotelRequest.setEmail("myhotel@gmail.com");
+		hotelRequest.setAddress(address);
+		hotelRequest.setName("MyHotel");
+		hotelRequest.setPassword("1234");
+		hotelRequest.setPhone("9999999999");
+		hotelRequest.setTelephone("9000000000");
+		hotelRequest.setType(HotelType.Hotel);
+		
+		Hotel hotel = hotelService.registerHotel(hotelRequest);
+		
 		assertEquals("myhotel@gmail.com", hotel.getHotelEmail());
 	}
 

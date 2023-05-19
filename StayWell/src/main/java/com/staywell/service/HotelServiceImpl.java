@@ -106,7 +106,8 @@ public class HotelServiceImpl implements HotelService {
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
-		return hotelDao.setEmailOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		hotelDao.setEmailOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		return hotelDao.findById(currentHotel.getHotelId()).get();
 	}
 
 	@Override
@@ -116,7 +117,8 @@ public class HotelServiceImpl implements HotelService {
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
-		return hotelDao.setNameOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		 hotelDao.setNameOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		 return hotelDao.findById(currentHotel.getHotelId()).get();
 	}
 
 	@Override
@@ -126,7 +128,8 @@ public class HotelServiceImpl implements HotelService {
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
-		return hotelDao.setPhoneOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		 hotelDao.setPhoneOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		 return hotelDao.findById(currentHotel.getHotelId()).get();
 	}
 
 	@Override
@@ -136,10 +139,11 @@ public class HotelServiceImpl implements HotelService {
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
-		return hotelDao.setTelephoneOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		 hotelDao.setTelephoneOfHotel(currentHotel.getHotelId(), updateRequest.getField());
+		 return hotelDao.findById(currentHotel.getHotelId()).get();
 	}
 
-	private boolean isEmailExists(String email) {
+	public boolean isEmailExists(String email) {
 		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
 	}
 
