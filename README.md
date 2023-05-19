@@ -71,9 +71,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/StayWell
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.username=your_username_here
 spring.datasource.password=your_password_here
-```
+
 ## API Root Endpoint
-```
+
 https://localhost:8808/
 ```
 ```
