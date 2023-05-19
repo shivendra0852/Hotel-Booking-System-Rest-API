@@ -1,6 +1,7 @@
 package com.staywell.config;
 
 import java.io.IOException;
+import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -28,6 +29,12 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
     private static final String ISSUER = "IP";
     private static final String SUBJECT = "JWT Token";
 
+    private final SecretKey secretKey;
+
+    public JwtTokenGeneratorFilter(Key key) {
+        this.secretKey = (SecretKey) key;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -35,8 +42,6 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (null != authentication) {
-            SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
-
             String jwt = Jwts.builder()
                     .setIssuer(ISSUER)
                     .setSubject(SUBJECT)
@@ -44,7 +49,7 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
                     .claim("authorities", populateAuthorities(authentication.getAuthorities()))
                     .setIssuedAt(Date.from(Instant.now()))
                     .setExpiration(Date.from(Instant.now().plus(EXPIRATION_TIME_MINUTES, ChronoUnit.MINUTES)))
-                    .signWith(key).compact();
+                    .signWith(secretKey).compact();
 
             response.setHeader(SecurityConstants.JWT_HEADER, jwt);
         }
