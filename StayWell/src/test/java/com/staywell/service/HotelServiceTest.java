@@ -252,8 +252,42 @@ public class HotelServiceTest {
 		verify(hotelDao, times(1)).findByHotelEmail("myhotel@gmail.com");
 		
 	}
+
+	@Test
+	@Order(10)
+	public void testGetHotelById() {
+		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
+		List<String> amenities = new ArrayList<>();
+		List<Room> rooms = new ArrayList<>();
+		List<Reservation> reservations = new ArrayList<>();
+		List<Feedback> feedbacks = new ArrayList<>();
+		rooms.add(new Room(1001, 1, "AC", 2, BigDecimal.valueOf(5000.0), true, null, reservations));
+
+		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
+				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
+		
+		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(dummyHotel));
+		
+		Hotel hotel = hotelService.getHotelById(1L);
+		
+		assertEquals(1L, hotel.getHotelId());
+		assertEquals("myhotel@gmail.com", hotel.getHotelEmail());
+		
+	}
 	
-	
-	
+	@Test
+	@Order(9)
+	public void testGetHotelsInCity() {
+		
+		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
+
+		Customer customer = new Customer();
+		customer.setAddress(address);
+				
+		when(hotelDao.findByAddress(any())).thenReturn(new ArrayList<>());
+		
+		assertThrows(HotelException.class, ()-> hotelService.getHotelsInCity("Jaipur"));
+		
+	}
 	
 }
