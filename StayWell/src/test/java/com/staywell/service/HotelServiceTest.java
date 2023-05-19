@@ -152,6 +152,7 @@ public class HotelServiceTest {
 		Hotel hotel = hotelService.updateEmail(updateDTO);
 		
 		assertEquals("hotel@gmail.com", hotel.getHotelEmail());
+		assertEquals("9999999999", hotel.getHotelPhone());
 		
 	}
 	
