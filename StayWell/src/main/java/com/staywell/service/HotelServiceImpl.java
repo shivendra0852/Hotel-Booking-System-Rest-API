@@ -15,7 +15,6 @@ import com.staywell.exception.HotelException;
 import com.staywell.model.Address;
 import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
-import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
@@ -88,6 +87,7 @@ public class HotelServiceImpl implements HotelService {
 		Customer customer = customerDao.findByEmail(email).orElseThrow(
 				() -> new HotelException("Failed to fetch the customer with the email: " + email));
 		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
+		if(hotels.isEmpty()) throw new HotelException("Hotels Not Found In Your Area!");
 		return hotels;
 	}
 
@@ -96,6 +96,7 @@ public class HotelServiceImpl implements HotelService {
 		Address address = new Address();
 		address.setCity(city);
 		List<Hotel> hotels = hotelDao.findByAddress(address);
+		if(hotels.isEmpty()) throw new HotelException("Hotels Not Found In Your Area!");
 		return hotels;
 	}
 
