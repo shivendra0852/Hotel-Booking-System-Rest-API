@@ -153,7 +153,6 @@ public class HotelServiceTest {
 		
 		assertEquals("hotel@gmail.com", hotel.getHotelEmail());
 		
-		
 	}
 	
 }
