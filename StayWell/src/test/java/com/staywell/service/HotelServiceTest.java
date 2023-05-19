@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
-
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -82,20 +81,17 @@ public class HotelServiceTest {
 		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
 				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
 		
-        when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.empty());
-		when(customerDao.findByEmail(anyString())).thenReturn(Optional.empty());
-		
 		when(hotelDao.save(any())).thenReturn(dummyHotel);
 		
 		when(customerDao.findByEmail(anyString())).thenReturn(Optional.empty());
 		doReturn(Optional.empty()).when(hotelDao).findByHotelEmail(anyString());
 		
-		Hotel hotel = hotelService.registerHotel(hotelRequest);
-		
 		HotelDTO hotelDTO = new HotelDTO();
 		hotelDTO.setEmail("any@gmail.com");
 		
 		Hotel hotel = hotelService.registerHotel(hotelDTO);
+		
+		assertEquals("MyHotel", hotel.getName());
 		
 	}
 
@@ -140,12 +136,22 @@ public class HotelServiceTest {
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("abc@gmailcom");
 
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(dummyHotel));
+		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 		
 		UpdateHotelDetailsDTO updateDTO = new UpdateHotelDetailsDTO();
 		updateDTO.setPassword("1234");
 		updateDTO.setField("hotel@gmail.com");
 		
+		when(hotelDao.setEmailOfHotel(anyLong(), anyString())).thenReturn(1);
 		
+		Hotel dummyHotel2 = dummyHotel;
+		dummyHotel.setHotelEmail("hotel@gmail.com");
+		
+		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(dummyHotel2));
+		
+		Hotel hotel = hotelService.updateEmail(updateDTO);
+		
+		assertEquals("hotel@gmail.com", hotel.getHotelEmail());
 		
 	}
 	
