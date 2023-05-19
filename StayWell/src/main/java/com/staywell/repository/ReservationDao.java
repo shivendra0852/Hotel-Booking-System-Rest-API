@@ -29,4 +29,5 @@ public interface ReservationDao extends JpaRepository<Reservation, Integer> {
 	
 	List<Reservation> findByHotelAndCustomer(Hotel hotel, Customer customer);
 	
+	
 }
