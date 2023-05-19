@@ -2,8 +2,8 @@ package com.staywell.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -23,12 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.staywell.dto.HotelDTO;
+import com.staywell.dto.UpdateHotelDetailsDTO;
 import com.staywell.enums.HotelType;
 import com.staywell.model.Address;
-import com.staywell.model.Customer;
 import com.staywell.model.Feedback;
 import com.staywell.model.Hotel;
 import com.staywell.model.Reservation;
@@ -57,6 +58,9 @@ public class HotelServiceTest {
 	@Mock
 	private Authentication authentication;
 	
+	@Mock
+	private PasswordEncoder passwordEncoder;
+	
 	@InjectMocks
 	private HotelServiceImpl hotelService;
 	
@@ -77,17 +81,67 @@ public class HotelServiceTest {
 		
 		
 		
-		when(customerDao.findByEmail(anyString())).thenReturn(Optional.of(new Customer()));
-		doReturn(Optional.of(new Hotel())).when(hotelDao).findByHotelEmail(anyString());
+		when(customerDao.findByEmail(anyString())).thenReturn(Optional.empty());
+		doReturn(Optional.empty()).when(hotelDao).findByHotelEmail(anyString());
 		
 		when(hotelDao.save(any())).thenReturn(dummyHotel);
 		
-		Hotel hotel = hotelService.registerHotel(new HotelDTO());
+		HotelDTO hotelDTO = new HotelDTO();
+		hotelDTO.setEmail("any@gmail.com");
+		
+		Hotel hotel = hotelService.registerHotel(hotelDTO);
 		assertEquals("myhotel@gmail.com", hotel.getHotelEmail());
+		
 	}
 
+	@Test
+	@Order(2)
+	public void testGetHotelById() {
+		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
+		List<String> amenities = new ArrayList<>();
+		List<Room> rooms = new ArrayList<>();
+		List<Reservation> reservations = new ArrayList<>();
+		List<Feedback> feedbacks = new ArrayList<>();
+		rooms.add(new Room(1001, 1, "AC", 2, BigDecimal.valueOf(5000.0), true, null, reservations));
+
+		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
+				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
+		
+		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(dummyHotel));
+		
+		Hotel hotel = hotelService.getHotelById(1L);
+		
+		assertEquals(1L, hotel.getHotelId());
+		assertEquals("myhotel@gmail.com", hotel.getHotelEmail());
+		
+	}
 	
-	
-	
+	@Test
+	@Order(3)
+	public void testUpdateEmail() {
+		
+		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
+		List<String> amenities = new ArrayList<>();
+		List<Room> rooms = new ArrayList<>();
+		List<Reservation> reservations = new ArrayList<>();
+		List<Feedback> feedbacks = new ArrayList<>();
+		rooms.add(new Room(1001, 1, "AC", 2, BigDecimal.valueOf(5000.0), true, null, reservations));
+
+		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
+				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
+		
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("abc@gmailcom");
+
+		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(dummyHotel));
+		
+		UpdateHotelDetailsDTO updateDTO = new UpdateHotelDetailsDTO();
+		updateDTO.setPassword("1234");
+		updateDTO.setField("hotel@gmail.com");
+		
+		
+		
+	}
 	
 }
