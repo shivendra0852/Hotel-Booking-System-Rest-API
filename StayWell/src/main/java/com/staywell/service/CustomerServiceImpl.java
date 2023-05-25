@@ -51,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         
-        System.out.println(email);
+        System.out.println(auth);
 
         Optional<Customer> customerExist = cDao.findByEmail(email);
 
