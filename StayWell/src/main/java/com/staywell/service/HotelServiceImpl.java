@@ -38,21 +38,23 @@ public class HotelServiceImpl implements HotelService {
 	@Override
 	public Hotel registerHotel(HotelDTO hotelRequest) {
 		/* Checking if there exists a user or a hotel with the provided email */
-		if (isEmailExists(hotelRequest.getEmail())) {
+		if (isEmailExists(hotelRequest.getHotelEmail())) {
 			throw new HotelException("This email is already registered. Please use a different email to register.");
 		}
 
 		/* Creating a hotel object and mapping attributes from request DTO to hotel entity */
 		Hotel hotel = new Hotel();
 		hotel.setName(hotelRequest.getName());
-		hotel.setHotelEmail(hotelRequest.getEmail());
-		hotel.setHotelPhone(hotelRequest.getPhone());
-		hotel.setHotelTelephone(hotelRequest.getTelephone());
+		hotel.setHotelEmail(hotelRequest.getHotelEmail());
+		hotel.setHotelPhone(hotelRequest.getHotelPhone());
+		hotel.setHotelTelephone(hotelRequest.getHotelPhone());
 		hotel.setPassword(passwordEncoder.encode(hotelRequest.getPassword()));
-		hotel.setHotelType(hotelRequest.getType());
-		hotel.setRole(Role.HOTEL.toString());
+		hotel.setHotelType(hotelRequest.getHotelType());
+		hotel.setRole("ROLE_"+(Role.HOTEL.toString()));
 		hotel.setAddress(hotelRequest.getAddress());
 
+		
+		System.out.println("Shivendra!");
 		/* Saving to the database */
 		return hotelDao.save(hotel);
 	}

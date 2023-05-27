@@ -2,6 +2,7 @@ package com.staywell.model;
 
 import java.util.Objects;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {
+	@Size(min=8, message="Please enter a valid streetAdress")
 	private String streetAddress;
     private String city;
     private String state;

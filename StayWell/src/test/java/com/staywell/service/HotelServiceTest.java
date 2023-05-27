@@ -90,13 +90,13 @@ public class HotelServiceTest {
 				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
 		
 		 hotelRequest = new HotelDTO();
-		hotelRequest.setEmail("myhotel@gmail.com");
+		hotelRequest.setHotelEmail("myhotel@gmail.com");
 		hotelRequest.setAddress(hotel.getAddress());
 		hotelRequest.setName("MyHotel");
 		hotelRequest.setPassword("1234");
-		hotelRequest.setPhone("9999999999");
-		hotelRequest.setTelephone("9000000000");
-		hotelRequest.setType(HotelType.Hotel);
+		hotelRequest.setHotelPhone("9999999999");
+		hotelRequest.setHotelPhone("9000000000");
+		hotelRequest.setHotelType(HotelType.HOTEL);
 		
 	}
 	

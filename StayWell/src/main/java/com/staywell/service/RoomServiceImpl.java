@@ -43,11 +43,17 @@ public class RoomServiceImpl implements RoomService{
 				throw new RoomException("Room already present in your hotel with room number : " + room.getRoomNumber());
 			}
 		}
+
 		
-		rooms.add(room);
+		roomDao.save(room);
+		
+		hotel.getRooms().add(room);
+		
 		room.setHotel(hotel);
 		
-		return roomDao.save(room);
+		hotelDao.save(hotel);
+		
+		return room;
 		
 	}
 

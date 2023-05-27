@@ -17,6 +17,8 @@ import com.staywell.dto.UpdateHotelDetailsDTO;
 import com.staywell.model.Hotel;
 import com.staywell.service.HotelService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/staywell/hotels")
 public class HotelController {
@@ -26,7 +28,7 @@ public class HotelController {
 	private HotelService hotelService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<Hotel> registerHotel(HotelDTO hotelRequest){	
+	public ResponseEntity<Hotel> registerHotel(@Valid @RequestBody HotelDTO hotelRequest){	
 		return new ResponseEntity<Hotel>(hotelService.registerHotel(hotelRequest), HttpStatus.CREATED);		
 	}
 

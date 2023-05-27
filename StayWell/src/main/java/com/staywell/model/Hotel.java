@@ -1,14 +1,18 @@
 package com.staywell.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.staywell.enums.HotelType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,13 +46,12 @@ public class Hotel {
 	@NotNull
 	@NotEmpty
 	private String hotelTelephone;
-	@NotNull
-	@NotEmpty
-	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\\\S+$).{8,}")
-	private String password;
 	
+	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")
 	@NotNull
 	@NotEmpty
+	private String password;
+
 	@Embedded
 	private Address address;
 	
@@ -56,15 +59,17 @@ public class Hotel {
 	
 	@Enumerated(EnumType.STRING)
 	private HotelType hotelType;
-	private List<String> amenities;
+	
+	@ElementCollection(fetch = FetchType.EAGER)
+	private List<String> amenities = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private List<Room> rooms = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "hotel")
-	private List<Room> rooms;
+	private List<Reservation> reservations = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "hotel")
-	private List<Reservation> reservations;
-	
-	@OneToMany(mappedBy = "hotel")
-	private List<Feedback> feedbacks;
+	private List<Feedback> feedbacks = new ArrayList<>();
 	
 }
