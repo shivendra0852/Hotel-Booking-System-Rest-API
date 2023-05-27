@@ -27,6 +27,7 @@ public class AppConfig {
         .requestMatchers(HttpMethod.POST, "/staywell/hotels/register").permitAll()
         .requestMatchers(HttpMethod.POST, "/staywell/rooms/add").hasRole("HOTEL")
         .requestMatchers(HttpMethod.PUT, "/staywell/customer/update").hasRole("CUSTOMER")
+        .requestMatchers(HttpMethod.GET, "/staywell/customer/getAllCustomer").hasRole("ADMIN")
 		.anyRequest()
 		.authenticated()
 		.and()
