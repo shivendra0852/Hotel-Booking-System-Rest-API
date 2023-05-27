@@ -11,10 +11,12 @@ public interface RoomService {
 
 	public Room addRoom(Room room) throws RoomException;
 	
-	public Room updateRoom(Integer roomNo, RoomDTO roomDTO) throws RoomException;
+	public Room updateRoom(Integer roomId, RoomDTO roomDTO) throws RoomException;
 	
-	public String removeRoom(Integer roomNo) throws RoomException;
+	public String removeRoom(Integer roomId) throws RoomException;
 	
 	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut) throws RoomException;
+	
+	public List<Room> getAllRoomsByHotel() throws RoomException;
 	
 }
