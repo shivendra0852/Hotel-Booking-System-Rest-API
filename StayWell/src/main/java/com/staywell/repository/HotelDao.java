@@ -33,5 +33,6 @@ public interface HotelDao extends JpaRepository<Hotel, Long>{
 	/*Overridden equals and hash code on city field*/
 	List<Hotel> findByAddress(Address address);
 
+	Optional<Hotel> findByNameAndAddress(String name, Address address);
 	
 }

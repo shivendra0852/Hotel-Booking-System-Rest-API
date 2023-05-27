@@ -1,4 +1,4 @@
-package com.staywell.model;
+package com.staywell.dto;
 
 import java.time.LocalDate;
 
