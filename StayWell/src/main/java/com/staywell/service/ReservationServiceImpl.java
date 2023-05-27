@@ -37,47 +37,47 @@ public class ReservationServiceImpl implements ReservationService {
 	@Autowired
 	private RoomDao roomDao;
 
-//	@Override
-//	public Reservation createReservation(Integer roomId, Reservation reservation, String paymentType)
-//			throws ReservationException, RoomException {
-//
-//		Customer customer = getCurrentLoggedInCustomer();
-//
-//		Optional<Room> opt = roomDao.findById(roomId);
-//		if (opt.isEmpty())
-//			throw new RoomException("Room Not Found With Id : " + roomId);
-//		Room room = opt.get();
-//
-//		Hotel hotel = room.getHotel();
-//		reservationDao.updateReservationStatus(hotel);
-//
-//		List<Reservation> reservations = reservationDao.findByRoomAndStatus(room, ReservationStatus.BOOKED);
-//
-//		LocalDate checkIn = reservation.getCheckinDate();
-//		LocalDate checkOut = reservation.getCheckinDate();
-//		for (Reservation r : reservations) {
-//			if ((checkIn.isEqual(r.getCheckinDate()) || checkIn.isEqual(r.getCheckinDate()))
-//					|| (checkOut.isEqual(r.getCheckinDate()) || checkOut.isEqual(r.getCheckinDate()))
-//					|| (checkIn.isAfter(r.getCheckinDate()) && checkIn.isBefore(r.getCheckinDate()))
-//					|| (checkOut.isAfter(r.getCheckinDate()) && checkOut.isBefore(r.getCheckinDate()))) {
-//				throw new ReservationException("Room Not Available for this date!");
-//			}
-//		}
-//
-//		room.getReservations().add(reservation);
-//		hotel.getReservations().add(reservation);
-//		customer.getReservations().add(reservation);
-//
-//		reservation.setRoom(room);
-//		reservation.setHotel(hotel);
-//		reservation.setCustomer(customer);
-//
-//		reservation.setStatus(ReservationStatus.BOOKED);
-//		reservation.setPayment(new Payment(PaymentType.valueOf(paymentType), true));
-//
-//		return reservationDao.save(reservation);
-//
-//	}
+	@Override
+	public Reservation createReservation(Integer roomId, Reservation reservation, String paymentType)
+			throws ReservationException, RoomException {
+
+		Customer customer = getCurrentLoggedInCustomer();
+
+		Optional<Room> opt = roomDao.findById(roomId);
+		if (opt.isEmpty())
+			throw new RoomException("Room Not Found With Id : " + roomId);
+		Room room = opt.get();
+
+		Hotel hotel = room.getHotel();
+		reservationDao.updateReservationStatus(hotel);
+
+		List<Reservation> reservations = reservationDao.findByRoomAndStatus(room, ReservationStatus.BOOKED);
+
+		LocalDate checkIn = reservation.getCheckinDate();
+		LocalDate checkOut = reservation.getCheckinDate();
+		for (Reservation r : reservations) {
+			if ((checkIn.isEqual(r.getCheckinDate()) || checkIn.isEqual(r.getCheckinDate()))
+					|| (checkOut.isEqual(r.getCheckinDate()) || checkOut.isEqual(r.getCheckinDate()))
+					|| (checkIn.isAfter(r.getCheckinDate()) && checkIn.isBefore(r.getCheckinDate()))
+					|| (checkOut.isAfter(r.getCheckinDate()) && checkOut.isBefore(r.getCheckinDate()))) {
+				throw new ReservationException("Room Not Available for this date!");
+			}
+		}
+
+		room.getReservations().add(reservation);
+		hotel.getReservations().add(reservation);
+		customer.getReservations().add(reservation);
+
+		reservation.setRoom(room);
+		reservation.setHotel(hotel);
+		reservation.setCustomer(customer);
+
+		reservation.setStatus(ReservationStatus.BOOKED);
+		reservation.setPayment(new Payment(PaymentType.valueOf(paymentType), true));
+
+		return reservationDao.save(reservation);
+
+	}
 
 	@Override
 	public String cancelReservation(Integer reservationId) throws ReservationException {
@@ -172,13 +172,6 @@ public class ReservationServiceImpl implements ReservationService {
 	private Customer getCurrentLoggedInCustomer() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 		return customerDao.findByEmail(email).get();
-	}
-
-	@Override
-	public Reservation createReservation(Integer roomId, Reservation reservation, String paymentType)
-			throws ReservationException, RoomException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

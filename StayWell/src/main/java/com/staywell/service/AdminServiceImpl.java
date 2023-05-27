@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.staywell.enums.Role;
 import com.staywell.exception.AdminException;
-import com.staywell.exception.AuthenticationException;
 import com.staywell.model.Admin;
 import com.staywell.repository.AdminDao;
 

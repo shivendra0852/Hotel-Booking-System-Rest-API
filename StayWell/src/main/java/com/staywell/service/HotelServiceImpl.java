@@ -66,18 +66,18 @@ public class HotelServiceImpl implements HotelService {
 		throw new HotelException("No hotel found with the id " + id);
 	}
 
-//	@Override
-//	public boolean deactivateHotelAccount() {
-//		Hotel currentHotel = getCurrentLoggedInHotel();
-//		reservationDao.updateReservationStatus(currentHotel);
-//		List<Reservation> reservations = reservationDao.getAllPendingReservations(currentHotel);
-//		if (reservations.isEmpty()) {
-//			hotelDao.delete(currentHotel);
-//			return true;
-//		}
-//		throw new HotelException("Hotel " + currentHotel.getName()
-//					+ " has reservations booked for the future. Please serve/cancel those reservations before deleting the account.");
-//	}
+	@Override
+	public boolean deactivateHotelAccount() {
+		Hotel currentHotel = getCurrentLoggedInHotel();
+		reservationDao.updateReservationStatus(currentHotel);
+		List<Reservation> reservations = reservationDao.getAllPendingReservations(currentHotel);
+		if (reservations.isEmpty()) {
+			hotelDao.delete(currentHotel);
+			return true;
+		}
+		throw new HotelException("Hotel " + currentHotel.getName()
+					+ " has reservations booked for the future. Please serve/cancel those reservations before deleting the account.");
+	}
 
 	@Override
 	public List<Hotel> getHotelsNearMe() {
@@ -151,10 +151,5 @@ public class HotelServiceImpl implements HotelService {
 		return hotelDao.findByHotelEmail(email)
 				.orElseThrow(() -> new HotelException("Failed to fetch the hotel with the email: " + email));
 	}
-
-	@Override
-	public boolean deactivateHotelAccount() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	
 }

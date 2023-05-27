@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.staywell.dto.CustomerDTO;
 import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
-import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 @Service
 public class CustomerServiceImpl implements CustomerService{
