@@ -89,9 +89,9 @@ public class HotelServiceImpl implements HotelService {
 
 	@Override
 	public List<Hotel> getHotelsNearMe() {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		Customer customer = customerDao.findByEmail(email)
-				.orElseThrow(() -> new HotelException("Failed to fetch the customer with the email: " + email));
+
+		Customer customer = getCurrentLoggedInCustomer();
+
 		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
 		if (hotels.isEmpty())
 			throw new HotelException("Hotels Not Found In Your Area!");
@@ -158,8 +158,12 @@ public class HotelServiceImpl implements HotelService {
 
 	private Hotel getCurrentLoggedInHotel() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		return hotelDao.findByHotelEmail(email)
-				.orElseThrow(() -> new HotelException("Failed to fetch the hotel with the email: " + email));
+		return hotelDao.findByHotelEmail(email).get();
+	}
+
+	private Customer getCurrentLoggedInCustomer() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		return customerDao.findByEmail(email).get();
 	}
 
 	private boolean hotelWithNameAlreadyExitsInYourCity(String name, Address address) {

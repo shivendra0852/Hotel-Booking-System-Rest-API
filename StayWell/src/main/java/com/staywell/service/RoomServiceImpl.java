@@ -1,7 +1,6 @@
 package com.staywell.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -158,9 +157,8 @@ public class RoomServiceImpl implements RoomService {
 		/* Getting all rooms and filtering if available */
 		List<Room> rooms = hotel.getRooms().stream().filter(h -> h.getAvailable()).collect(Collectors.toList());
 
-		/* Filtering out closed reservations out of all reservation of that hotel */
-		List<Reservation> reservations = hotel.getReservations().stream()
-				.filter((r) -> !r.getStatus().toString().equals("CLOSED")).collect(Collectors.toList());
+		/* Fetching current and future reservations out of all reservation of a particular hotel */
+		List<Reservation> reservations = reservationDao.getAllPendingReservations(hotel);
 
 		/* Filtering out rooms that are not available for the provided dates */
 		for (Reservation r : reservations) {
