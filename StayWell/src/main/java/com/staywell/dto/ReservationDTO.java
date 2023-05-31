@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class ReservationDTO {
 	@FutureOrPresent
 	private LocalDate checkoutDate;
 	
+	@Min(1)
 	private Integer noOfPerson;
 	
 }

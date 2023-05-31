@@ -2,13 +2,14 @@ package com.staywell.service;
 
 import java.util.List;
 
+import com.staywell.dto.ReservationDTO;
 import com.staywell.exception.ReservationException;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Reservation;
 
 public interface ReservationService {
 
-	public Reservation createReservation(Integer roomId, Reservation reservation, String paymentType) throws ReservationException, RoomException;
+	public Reservation createReservation(Integer roomId, ReservationDTO reservationDTO, String paymentType, String txnId) throws ReservationException, RoomException;
 	
 	public String cancelReservation(Integer reservationId) throws ReservationException;
 	

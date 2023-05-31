@@ -17,15 +17,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 public class Reservation {
 	@Id
@@ -34,14 +34,11 @@ public class Reservation {
 	private Integer reservationId;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	@FutureOrPresent
 	private LocalDate checkinDate;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd")
-	@FutureOrPresent
 	private LocalDate checkoutDate;
 	
-	@Min(1)
 	private Integer noOfPerson;
 	
 	@Embedded
@@ -61,4 +58,5 @@ public class Reservation {
 	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.ALL)
 	private Customer customer;
+	
 }
