@@ -234,8 +234,12 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	private Room buildRoom(RoomDTO roomDTO) {
-		return Room.builder().roomNumber(roomDTO.getRoomNumber()).roomType(roomDTO.getRoomType())
-				.noOfPerson(roomDTO.getNoOfPerson()).price(roomDTO.getPrice()).available(roomDTO.getAvailable())
+		return Room.builder()
+				.roomNumber(roomDTO.getRoomNumber())
+				.roomType(roomDTO.getRoomType())
+				.noOfPerson(roomDTO.getNoOfPerson())
+				.price(roomDTO.getPrice())
+				.available(roomDTO.getAvailable())
 				.build();
 	}
 
