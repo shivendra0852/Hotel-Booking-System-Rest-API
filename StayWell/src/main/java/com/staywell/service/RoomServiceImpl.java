@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,22 +22,17 @@ import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
 import com.staywell.repository.RoomDao;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@AllArgsConstructor
 @Service
 @Slf4j
 public class RoomServiceImpl implements RoomService {
 
-	@Autowired
 	private PasswordEncoder passwordEncoder;
-
-	@Autowired
 	private HotelDao hotelDao;
-
-	@Autowired
 	private RoomDao roomDao;
-
-	@Autowired
 	private ReservationDao reservationDao;
 
 	@Override

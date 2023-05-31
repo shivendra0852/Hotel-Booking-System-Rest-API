@@ -12,13 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment {
-//	private String cardholderName;
-//    private String cardNumber;
-//    private String cvv;
-//    private LocalDate expirationDate;
-	
+
 	@Enumerated(EnumType.STRING)
 	private PaymentType paymentType;
-	private Boolean paymentStatus;
+	private String txnId;
 
 }

@@ -2,12 +2,12 @@ package com.staywell.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,13 +18,13 @@ import com.staywell.model.Hotel;
 import com.staywell.service.HotelService;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/staywell/hotels")
 public class HotelController {
 
-	
-	@Autowired
 	private HotelService hotelService;
 	
 	@PostMapping("/register")
@@ -36,20 +36,20 @@ public class HotelController {
 	public ResponseEntity<Hotel> getHotelById(@PathVariable("hotelId") long hotelId){
 		return new ResponseEntity<Hotel>(hotelService.getHotelById(hotelId), HttpStatus.FOUND);
 	}
-	@GetMapping("/update-name")
+	@PutMapping("/update-name")
 	public ResponseEntity<Hotel> updateName(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updateName(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	
-	@GetMapping("/update-email")
+	@PutMapping("/update-email")
 	public ResponseEntity<Hotel> updateEmail(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updateEmail(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
-	@GetMapping("/update-phone")
+	@PutMapping("/update-phone")
 	public ResponseEntity<Hotel> updatePhone(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updatePhone(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
-	@GetMapping("/update-telephone")
+	@PutMapping("/update-telephone")
 	public ResponseEntity<Hotel> updateTelephone(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updateTelephone(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
