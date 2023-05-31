@@ -66,10 +66,10 @@ public class Hotel {
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Room> rooms = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "hotel")
+	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Reservation> reservations = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "hotel")
+	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Feedback> feedbacks = new ArrayList<>();
 	
 }

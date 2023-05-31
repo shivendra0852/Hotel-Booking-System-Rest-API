@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.staywell.dto.HotelDTO;
-import com.staywell.dto.UpdateHotelDetailsDTO;
+import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.enums.Role;
 import com.staywell.exception.HotelException;
 import com.staywell.model.Address;
@@ -109,7 +109,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Hotel updateEmail(UpdateHotelDetailsDTO updateRequest) {
+	public Hotel updateEmail(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
@@ -120,7 +120,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Hotel updateName(UpdateHotelDetailsDTO updateRequest) {
+	public Hotel updateName(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
@@ -131,7 +131,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Hotel updatePhone(UpdateHotelDetailsDTO updateRequest) {
+	public Hotel updatePhone(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
@@ -142,7 +142,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Hotel updateTelephone(UpdateHotelDetailsDTO updateRequest) {
+	public Hotel updateTelephone(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {

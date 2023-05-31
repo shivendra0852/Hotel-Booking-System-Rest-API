@@ -4,14 +4,21 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.staywell.dto.RoomDTO;
+import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Room;
 
 public interface RoomService {
 
-	public Room addRoom(Room room) throws RoomException;
+	public Room addRoom(RoomDTO roomDTO) throws RoomException;
 	
-	public Room updateRoom(Integer roomId, RoomDTO roomDTO) throws RoomException;
+	public String updateRoomType(UpdateDetailsDTO updateRequest, Integer roomId);
+	
+	public String updateNoOfPerson(UpdateDetailsDTO updateRequest, Integer roomId);
+	
+	public String updatePrice(UpdateDetailsDTO updateRequest, Integer roomId);
+	
+	public String updateAvailable(UpdateDetailsDTO updateRequest, Integer roomId);
 	
 	public String removeRoom(Integer roomId) throws RoomException;
 	
