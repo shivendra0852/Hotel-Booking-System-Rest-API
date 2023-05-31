@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateHotelDetailsDTO {
+public class UpdateDetailsDTO {
 
 	String field;
 	String password;

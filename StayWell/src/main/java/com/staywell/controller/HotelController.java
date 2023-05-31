@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.staywell.dto.HotelDTO;
-import com.staywell.dto.UpdateHotelDetailsDTO;
+import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.model.Hotel;
 import com.staywell.service.HotelService;
 
@@ -37,20 +37,20 @@ public class HotelController {
 		return new ResponseEntity<Hotel>(hotelService.getHotelById(hotelId), HttpStatus.FOUND);
 	}
 	@GetMapping("/update-name")
-	public ResponseEntity<Hotel> updateName(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+	public ResponseEntity<Hotel> updateName(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updateName(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	
 	@GetMapping("/update-email")
-	public ResponseEntity<Hotel> updateEmail(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+	public ResponseEntity<Hotel> updateEmail(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updateEmail(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	@GetMapping("/update-phone")
-	public ResponseEntity<Hotel> updatePhone(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+	public ResponseEntity<Hotel> updatePhone(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updatePhone(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	@GetMapping("/update-telephone")
-	public ResponseEntity<Hotel> updateTelephone(@RequestBody UpdateHotelDetailsDTO updateDetailsRequest){
+	public ResponseEntity<Hotel> updateTelephone(@RequestBody UpdateDetailsDTO updateDetailsRequest){
 		return new ResponseEntity<Hotel>(hotelService.updateTelephone(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 	
