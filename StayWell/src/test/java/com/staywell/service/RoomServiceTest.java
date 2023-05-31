@@ -34,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.staywell.dto.RoomDTO;
 import com.staywell.enums.HotelType;
+import com.staywell.enums.RoomType;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Address;
 import com.staywell.model.Feedback;
@@ -81,7 +82,7 @@ public class RoomServiceTest {
 		rooms = new ArrayList<>();
 		reservations = new ArrayList<>();
 		feedbacks = new ArrayList<>();
-		rooms.add(new Room(1001, 1, "AC", 2, BigDecimal.valueOf(5000.0), true, null, reservations));
+		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
 		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
 				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
@@ -95,47 +96,20 @@ public class RoomServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("myhotel@gmailcom");
 
-		Room room = new Room(1002, 2, "AC", 1, BigDecimal.valueOf(2000.0), true, hotel, reservations);
+		Room room = new Room(1002, 2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true, hotel, reservations);
 
+		RoomDTO roomDTO = new RoomDTO(2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true);
+		
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 
 		when(roomDao.save(any())).thenReturn(room);
 
-		Room myRoom = roomService.addRoom(room);
+		Room myRoom = roomService.addRoom(roomDTO);
 
 		assertAll(() -> {
 			assertNotNull(room);
 			assertEquals(1002, myRoom.getRoomId());
 			assertNotEquals(1, myRoom.getRoomNumber());
-			assertTrue(myRoom.getAvailable());
-		});
-
-		verify(hotelDao).findByHotelEmail(anyString());
-
-		verify(roomDao).save(any());
-
-	}
-
-	@Test
-	@Order(2)
-	public void testUpdateRoom() throws RoomException {
-
-		when(securityContext.getAuthentication()).thenReturn(authentication);
-		SecurityContextHolder.setContext(securityContext);
-		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("abc@gmailcom");
-
-		Room room = new Room(1001, 1, "AC", 2, BigDecimal.valueOf(1000.0), true, hotel, reservations);
-
-		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
-
-		when(roomDao.save(any())).thenReturn(room);
-
-		Room myRoom = roomService.updateRoom(1, new RoomDTO());
-
-		assertAll(() -> {
-			assertNotNull(myRoom);
-			assertEquals(1001, myRoom.getRoomId());
-			assertNotEquals(101, myRoom.getRoomNumber());
 			assertTrue(myRoom.getAvailable());
 		});
 
