@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,17 +16,17 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/staywell")
 public class LogoutController {
 
-    @GetMapping("/admin/logout")
+    @PostMapping("/admin/logout")
     public ResponseEntity<String> adminLogoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         return performLogout(request, response, auth);
     }
 
-    @GetMapping("/customer/logout")
+    @PostMapping("/customer/logout")
     public ResponseEntity<String> customerLogoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         return performLogout(request, response, auth);
     }
 
-    @GetMapping("/hotel/logout")
+    @PostMapping("/hotel/logout")
     public ResponseEntity<String> hotelLogoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         return performLogout(request, response, auth);
     }
