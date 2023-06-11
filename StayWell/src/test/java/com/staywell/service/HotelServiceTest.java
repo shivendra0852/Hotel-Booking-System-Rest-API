@@ -88,7 +88,7 @@ public class HotelServiceTest {
 		List<Feedback> feedbacks = new ArrayList<>();
 		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", new BCryptPasswordEncoder().encode("1234"), address, "HOTEL",
-				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
+				HotelType.HOTEL, amenities, rooms, reservations, feedbacks);
 		
 		 hotelRequest = new HotelDTO();
 		hotelRequest.setHotelEmail("myhotel@gmail.com");
@@ -265,7 +265,7 @@ public class HotelServiceTest {
 		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
 		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
-				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
+				HotelType.HOTEL, amenities, rooms, reservations, feedbacks);
 		
 		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(dummyHotel));
 		

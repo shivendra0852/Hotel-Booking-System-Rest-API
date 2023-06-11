@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -84,8 +85,8 @@ public class RoomServiceTest {
 		feedbacks = new ArrayList<>();
 		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
-		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address, "HOTEL",
-				HotelType.valueOf("Hotel"), amenities, rooms, reservations, feedbacks);
+		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address,
+				"HOTEL", HotelType.HOTEL, amenities, rooms, reservations, feedbacks);
 	}
 
 	@Test
@@ -99,7 +100,7 @@ public class RoomServiceTest {
 		Room room = new Room(1002, 2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true, hotel, reservations);
 
 		RoomDTO roomDTO = new RoomDTO(2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true);
-		
+
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 
 		when(roomDao.save(any())).thenReturn(room);
@@ -131,12 +132,18 @@ public class RoomServiceTest {
 
 		when(hotelDao.save(any())).thenReturn(hotel);
 
+		Room room = new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations);
+		when(roomDao.findById(anyInt())).thenReturn(Optional.of(room));
+		
+		assertEquals(1, hotel.getRooms().size());
+		
 		doNothing().when(roomDao).delete(any());
 
-		String result = roomService.removeRoom(1);
+		String result = roomService.removeRoom(1001);
 
 		assertAll(() -> {
 			assertEquals("Room removed successfully", result);
+			assertEquals(0, hotel.getRooms().size());
 		});
 
 		verify(roomDao, never()).save(any());

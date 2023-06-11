@@ -50,7 +50,7 @@ public class RoomServiceImpl implements RoomService {
 		}
 
 		Room room = buildRoom(roomDTO);
-		roomDao.save(room);
+		room = roomDao.save(room);
 
 		log.info("Assigning room to the Hotel : " + hotel.getName());
 		hotel.getRooms().add(room);
