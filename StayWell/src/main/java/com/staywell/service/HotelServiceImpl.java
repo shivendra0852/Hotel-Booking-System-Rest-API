@@ -64,7 +64,7 @@ public class HotelServiceImpl implements HotelService {
 	public boolean deactivateHotelAccount() {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 		reservationDao.updateReservationStatus(currentHotel);
-		List<Reservation> reservations = reservationDao.getAllPendingReservations(currentHotel);
+		List<Reservation> reservations = reservationDao.getPendingReservationsOfHotel(currentHotel);
 		if (reservations.isEmpty()) {
 			hotelDao.delete(currentHotel);
 			return true;

@@ -16,18 +16,17 @@ public interface ReservationDao extends JpaRepository<Reservation, Integer> {
 
 	List<Reservation> findByCustomer(Customer customer);
 
-    @Modifying
+	@Modifying
 	@Query("UPDATE Reservation r SET r.status = com.staywell.enums.ReservationStatus.CLOSED WHERE r.hotel = ?1 AND r.checkoutDate < CURDATE()")
 	void updateReservationStatus(Hotel hotel);
 
 	@Query("SELECT r FROM Reservation r WHERE r.hotel = ?1 AND r.checkoutDate >= CURDATE()")
-	List<Reservation> getAllPendingReservations(Hotel hotel);
-	
+	List<Reservation> getPendingReservationsOfHotel(Hotel hotel);
+
 	List<Reservation> findByRoomAndStatus(Room room, ReservationStatus status);
-	
+
 	List<Reservation> findByHotel(Hotel hotel);
-	
+
 	List<Reservation> findByHotelAndCustomer(Hotel hotel, Customer customer);
-	
-	
+
 }
