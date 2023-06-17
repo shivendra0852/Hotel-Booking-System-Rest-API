@@ -1,5 +1,5 @@
 package com.staywell.enums;
 
 public enum Role {
-	ADMIN,CUSTOMER,HOTEL;
+	ROLE_ADMIN, ROLE_CUSTOMER, ROLE_HOTEL;
 }

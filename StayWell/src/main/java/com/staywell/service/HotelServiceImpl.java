@@ -47,7 +47,6 @@ public class HotelServiceImpl implements HotelService {
 		}
 
 		Hotel hotel = buildHotel(hotelDTO);
-		hotel.setRole(Role.CUSTOMER);
 
 		return hotelDao.save(hotel);
 	}
@@ -139,7 +138,7 @@ public class HotelServiceImpl implements HotelService {
 		return hotelDao.findById(currentHotel.getHotelId()).get();
 	}
 
-	public boolean isEmailExists(String email) {
+	private boolean isEmailExists(String email) {
 		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
 	}
 
@@ -163,8 +162,8 @@ public class HotelServiceImpl implements HotelService {
 	private Hotel buildHotel(HotelDTO hotelDTO) {
 		return Hotel.builder().name(hotelDTO.getName()).hotelEmail(hotelDTO.getHotelEmail())
 				.hotelPhone(hotelDTO.getHotelPhone()).hotelTelephone(hotelDTO.getHotelTelephone())
-				.password(passwordEncoder.encode(hotelDTO.getPassword())).hotelType(hotelDTO.getHotelType())
-				.address(hotelDTO.getAddress()).build();
+				.password(passwordEncoder.encode(hotelDTO.getPassword())).role(Role.ROLE_HOTEL)
+				.hotelType(hotelDTO.getHotelType()).address(hotelDTO.getAddress()).build();
 	}
 
 }

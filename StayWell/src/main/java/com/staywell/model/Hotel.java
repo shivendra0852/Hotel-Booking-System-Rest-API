@@ -3,6 +3,8 @@ package com.staywell.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 
@@ -39,6 +41,7 @@ public class Hotel {
 	@Column(unique = true) @Email
 	private String hotelEmail;
 
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 
 	private String hotelPhone;

@@ -23,49 +23,48 @@ import com.staywell.service.CustomerService;
 @RequestMapping("/staywell/customer")
 public class CustomerController {
 
-    @Autowired
-    private CustomerService cService;
+	@Autowired
+	private CustomerService cService;
 
+	@PostMapping("/register")
+	public ResponseEntity<Customer> createCustomer(@RequestBody CustomerDTO customerDTO) {
 
-    @PostMapping("/register")
-    public ResponseEntity< Customer > createCustomer(@RequestBody Customer customer ) {
+		Customer res = cService.registerCustomer(customerDTO);
 
-        Customer res = cService.createCustomer(customer);
+		return new ResponseEntity<Customer>(res, HttpStatus.CREATED);
+	}
 
-        return new ResponseEntity<Customer>(res , HttpStatus.CREATED);
-    }
+	@PutMapping("/update")
+	public ResponseEntity<Customer> updateCustomer(@RequestBody CustomerDTO customerDto) {
 
-    @PutMapping("/update")
-    public  ResponseEntity<Customer> updateCustomer(@RequestBody CustomerDTO customerDto) {
+		Customer res = cService.updateCustomer(customerDto);
 
-            Customer res =  cService.updateCustomer(customerDto);
+		return new ResponseEntity<Customer>(res, HttpStatus.OK);
 
-            return new ResponseEntity<Customer>(res , HttpStatus.OK);
+	}
 
-    }
+	@DeleteMapping("/delete")
+	public ResponseEntity<Customer> deleteCustomer(Authentication authentication) {
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Customer> deleteCustomer(Authentication authentication) {
+		Customer res = cService.deleteCustomer(authentication);
 
-        Customer res = cService.deleteCustomer(authentication);
+		return new ResponseEntity<Customer>(res, HttpStatus.OK);
+	}
 
-        return new ResponseEntity<Customer>(res , HttpStatus.OK);
-    }
+	@GetMapping("/getAllCustomer")
+	public ResponseEntity<List<Customer>> getAllCustomer() {
 
-    @GetMapping("/getAllCustomer")
-    public ResponseEntity<List<Customer>> getAllCustomer() {
+		List<Customer> res = cService.getAllCustomer();
 
-        List<Customer> res = cService.getAllCustomer();
+		return new ResponseEntity<List<Customer>>(res, HttpStatus.OK);
+	}
 
-        return new ResponseEntity<List<Customer>>(res , HttpStatus.OK);
-    }
+	@GetMapping("/getCustomerById/{customerId}")
+	public ResponseEntity<Customer> getCustomerById(@PathVariable("customerId") Long customerId) {
 
-    @GetMapping("/getCustomerById/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable("id") Integer id) {
+		Customer res = cService.getCustomerById(customerId);
 
-        Customer  res = cService.getCustomerById(id);
-
-        return new ResponseEntity<Customer>(res , HttpStatus.OK);
-    }
+		return new ResponseEntity<Customer>(res, HttpStatus.OK);
+	}
 
 }

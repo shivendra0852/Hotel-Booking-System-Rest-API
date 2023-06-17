@@ -10,7 +10,7 @@ import com.staywell.model.Customer;
 
 public interface CustomerService {
 
-        public Customer createCustomer(Customer customer ) throws CustomerException;
+        public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException;
 
         public Customer updateCustomer(CustomerDTO customerDto) throws CustomerException;
 
@@ -18,9 +18,6 @@ public interface CustomerService {
 
         public List<Customer> getAllCustomer() throws CustomerException;
 
-        public Customer getCustomerById(Integer id) throws CustomerException;
-
-
-
+        public Customer getCustomerById(Long customerId) throws CustomerException;
 
 }

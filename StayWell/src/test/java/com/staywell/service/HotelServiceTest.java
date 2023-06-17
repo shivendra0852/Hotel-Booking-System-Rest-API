@@ -89,7 +89,7 @@ public class HotelServiceTest {
 		List<Feedback> feedbacks = new ArrayList<>();
 		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@1234", "9999999999", "9000000000",
-				HotelType.HOTEL, address, Role.HOTEL, amenities, rooms, reservations, feedbacks);
+				HotelType.HOTEL, address, Role.ROLE_HOTEL, amenities, rooms, reservations, feedbacks);
 
 		hotelRequest = new HotelDTO();
 		hotelRequest.setHotelEmail("myhotel@gmail.com");
@@ -145,7 +145,7 @@ public class HotelServiceTest {
 	@Order(4)
 	public void testGetHotelsNearMe() {
 		Customer customer = new Customer(Long.valueOf(1001), "prateek", "prateek@gmail.com", "Pass@123", "1111111111",
-				Gender.MALE, LocalDate.of(2002, 04, 26), hotel.getAddress(), Role.CUSTOMER, LocalDateTime.now(),
+				Gender.MALE, LocalDate.of(2002, 04, 26), hotel.getAddress(), Role.ROLE_CUSTOMER, LocalDateTime.now(),
 				new ArrayList<>());
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -267,7 +267,7 @@ public class HotelServiceTest {
 		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
 		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@1234", "9999999999",
-				"9000000000", HotelType.HOTEL, address, Role.HOTEL, amenities, rooms, reservations, feedbacks);
+				"9000000000", HotelType.HOTEL, address, Role.ROLE_HOTEL, amenities, rooms, reservations, feedbacks);
 
 		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(dummyHotel));
 

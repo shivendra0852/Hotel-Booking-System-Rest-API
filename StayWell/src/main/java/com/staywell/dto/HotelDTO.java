@@ -1,5 +1,7 @@
 package com.staywell.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.HotelType;
 import com.staywell.model.Address;
 
@@ -33,6 +35,7 @@ public class HotelDTO {
 	@NotNull @NotEmpty @NotBlank
 	private String hotelTelephone;
 
+	@JsonProperty(access = Access.WRITE_ONLY)
 	@NotNull @NotEmpty @NotBlank @Size(min = 8)
 	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")
 	private String password;

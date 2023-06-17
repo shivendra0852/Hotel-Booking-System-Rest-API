@@ -1,7 +1,6 @@
 package com.staywell.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,35 +15,29 @@ import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
 import com.staywell.repository.CustomerDao;
+import com.staywell.repository.HotelDao;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
-	private CustomerDao cDao;
+	private CustomerDao customerDao;
+
+	@Autowired
+	private HotelDao hotelDao;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Override
-	public Customer createCustomer(Customer customer) throws CustomerException {
+	public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException {
 
-		customer.setPassword(passwordEncoder.encode(customer.getPassword()));
-
-		Optional<Customer> customerExist = cDao.findByEmail(customer.getEmail());
-
-		if (customerExist.isEmpty()) {
-			customer.setRole(Role.CUSTOMER);
-
-			customer.setRegistrationDateTime(LocalDateTime.now());
-
-			customer.setReservations(new ArrayList<>());
-
-			return cDao.save(customer);
+		if (isEmailExists(customerDTO.getEmail())) {
+			throw new CustomerException("Customer is already exist ...!");
 		}
 
-		else
-			throw new CustomerException("Customer is already exist ...!");
+		Customer customer = buildCustomer(customerDTO);
+		return customerDao.save(customer);
 
 	}
 
@@ -55,7 +48,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		System.out.println(auth);
 
-		Optional<Customer> customerExist = cDao.findByEmail(email);
+		Optional<Customer> customerExist = customerDao.findByEmail(email);
 
 		if (customerExist.isPresent()) {
 			Customer customer = customerExist.get();
@@ -82,7 +75,7 @@ public class CustomerServiceImpl implements CustomerService {
 				customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
 			}
 
-			return cDao.save(customer);
+			return customerDao.save(customer);
 		} else {
 			throw new CustomerException("Customer does not exist");
 		}
@@ -90,11 +83,11 @@ public class CustomerServiceImpl implements CustomerService {
 
 	public Customer deleteCustomer(Authentication authentication) throws CustomerException {
 		String email = authentication.getName();
-		Optional<Customer> customerExist = cDao.findByEmail(email);
+		Optional<Customer> customerExist = customerDao.findByEmail(email);
 
 		if (customerExist.isPresent()) {
 			Customer customer = customerExist.get();
-			cDao.delete(customer);
+			customerDao.delete(customer);
 			return customer;
 		} else {
 			throw new CustomerException("Customer does not exist");
@@ -104,7 +97,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<Customer> getAllCustomer() throws CustomerException {
 
-		List<Customer> customers = cDao.findAll();
+		List<Customer> customers = customerDao.findAll();
 
 		if (!customers.isEmpty()) {
 
@@ -116,9 +109,9 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public Customer getCustomerById(Integer id) throws CustomerException {
+	public Customer getCustomerById(Long customerId) throws CustomerException {
 
-		Optional<Customer> customerExist = cDao.findById(id);
+		Optional<Customer> customerExist = customerDao.findById(customerId);
 
 		if (customerExist.isPresent()) {
 
@@ -128,6 +121,18 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 
 		else
-			throw new CustomerException("Customer not exist by this Id : " + id);
+			throw new CustomerException("Customer not exist by this Id : " + customerId);
 	}
+
+	private boolean isEmailExists(String email) {
+		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
+	}
+
+	private Customer buildCustomer(CustomerDTO customerDTO) {
+		return Customer.builder().name(customerDTO.getName()).email(customerDTO.getEmail())
+				.password(passwordEncoder.encode(customerDTO.getPassword())).phone(customerDTO.getPhone())
+				.gender(customerDTO.getGender()).registrationDateTime(LocalDateTime.now()).role(Role.ROLE_CUSTOMER)
+				.dob(customerDTO.getDob()).address(customerDTO.getAddress()).build();
+	}
+
 }

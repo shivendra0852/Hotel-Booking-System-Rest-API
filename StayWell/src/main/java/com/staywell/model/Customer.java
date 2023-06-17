@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.Gender;
 import com.staywell.enums.Role;
 
@@ -41,6 +43,7 @@ public class Customer {
 	@Column(unique = true) @Email
 	private String email;
 
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 
 	private String phone;
