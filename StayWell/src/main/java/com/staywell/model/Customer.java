@@ -31,19 +31,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Customer {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer customerId;
 
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer customerId;
+	
 	private String name;
+
 	@Column(unique = true)
 	private String email;
+
 	private String phone;
+
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+
 	private LocalDate dob;
+
 	private String password;
+
 	@Embedded
 	private Address address;
 
