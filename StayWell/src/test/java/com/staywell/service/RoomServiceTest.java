@@ -46,6 +46,7 @@ import com.staywell.model.Room;
 import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
 import com.staywell.repository.RoomDao;
+import com.staywell.service.impl.RoomServiceImpl;
 
 @SpringBootTest(classes = RoomServiceTest.class)
 @ExtendWith(MockitoExtension.class)

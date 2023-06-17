@@ -1,4 +1,4 @@
-package com.staywell.service;
+package com.staywell.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +20,7 @@ import com.staywell.model.Customer;
 import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
+import com.staywell.service.CustomerService;
 
 import lombok.extern.slf4j.Slf4j;
 

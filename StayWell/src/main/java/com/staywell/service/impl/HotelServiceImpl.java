@@ -1,4 +1,4 @@
-package com.staywell.service;
+package com.staywell.service.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +19,7 @@ import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
+import com.staywell.service.HotelService;
 
 @Service
 public class HotelServiceImpl implements HotelService {

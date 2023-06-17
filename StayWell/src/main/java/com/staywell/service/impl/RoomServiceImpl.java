@@ -1,4 +1,4 @@
-package com.staywell.service;
+package com.staywell.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,6 +21,7 @@ import com.staywell.model.Room;
 import com.staywell.repository.HotelDao;
 import com.staywell.repository.ReservationDao;
 import com.staywell.repository.RoomDao;
+import com.staywell.service.RoomService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

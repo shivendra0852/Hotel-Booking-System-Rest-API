@@ -1,4 +1,4 @@
-package com.staywell.service;
+package com.staywell.service.impl;
 
 import java.util.Optional;
 
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.staywell.exception.AdminException;
 import com.staywell.model.Admin;
 import com.staywell.repository.AdminDao;
+import com.staywell.service.AdminService;
 
 @Service
 public class AdminServiceImpl implements AdminService{
