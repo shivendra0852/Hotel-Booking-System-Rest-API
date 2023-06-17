@@ -26,9 +26,9 @@ import com.staywell.service.RoomService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
 @Service
 @Slf4j
+@AllArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
 	private PasswordEncoder passwordEncoder;
@@ -60,7 +60,6 @@ public class RoomServiceImpl implements RoomService {
 
 		log.info("Room saved successfully");
 		return room;
-
 	}
 
 	@Override
@@ -73,7 +72,7 @@ public class RoomServiceImpl implements RoomService {
 		}
 		roomDao.setRoomType(roomId, RoomType.valueOf(updateRequest.getField()));
 
-		log.info("Updated Room Type to " + updateRequest.getField());
+		log.info("Updation successfull");
 		return "Updated Room Type to " + updateRequest.getField();
 	}
 
@@ -87,7 +86,7 @@ public class RoomServiceImpl implements RoomService {
 		}
 		roomDao.setNoOfPerson(roomId, Integer.valueOf(updateRequest.getField()));
 
-		log.info("Updated number of person allowed per Room to " + updateRequest.getField());
+		log.info("Updation successfull");
 		return "Updated number of person allowed per Room to " + updateRequest.getField();
 	}
 
@@ -101,7 +100,7 @@ public class RoomServiceImpl implements RoomService {
 		}
 		roomDao.setPrice(roomId, BigDecimal.valueOf(Long.valueOf(updateRequest.getField())));
 
-		log.info("Updated Room Price to " + updateRequest.getField());
+		log.info("Updation successfull");
 		return "Updated Room Price to " + updateRequest.getField();
 	}
 
@@ -115,24 +114,22 @@ public class RoomServiceImpl implements RoomService {
 		}
 		roomDao.setAvailable(roomId, Boolean.valueOf(updateRequest.getField()));
 
-		log.info("Updated Room's availability to " + updateRequest.getField());
+		log.info("Updation successfull");
 		return "Updated Room's availability to " + updateRequest.getField();
 	}
 
 	@Override
 	public String removeRoom(Integer roomId) throws RoomException {
-
 		Hotel hotel = getCurrentLoggedInHotel();
-		Optional<Room> opt = roomDao.findById(roomId);
 
-		if (opt.isEmpty())
+		Optional<Room> optional = roomDao.findById(roomId);
+		if (optional.isEmpty())
 			throw new RoomException("Room not found with Id : " + roomId);
-		Room room = opt.get();
+		Room room = optional.get();
 
 		List<Room> rooms = hotel.getRooms();
 		List<Reservation> reservations = room.getReservations();
 
-		/* Checking if there is any pending reservation of this room */
 		log.info("Checking if this Room has any pending Reservations");
 		for (Reservation r : reservations) {
 			if (!r.getStatus().toString().equals("CLOSED")) {
@@ -145,30 +142,22 @@ public class RoomServiceImpl implements RoomService {
 			}
 		}
 
-		/*
-		 * Removing reference of room from every reservation of this room to avoid
-		 * deleting reservation with room due to cascade ALL
-		 */
 		log.info("Removing reference of Room from every Reservation");
 		for (Reservation r : reservations) {
 			r.setRoom(null);
 			reservationDao.save(r);
 		}
 
-		/*
-		 * Removing reference of room from hotel to avoid deleting hotel with room due
-		 * to cascade ALL
-		 */
 		log.info("Removing reference of Room from Hotel");
 		rooms.remove(room);
 		hotel.setRooms(rooms);
 		hotelDao.save(hotel);
 
+		log.info("Deletion in progress");
 		roomDao.delete(room);
 
 		log.info("Room removed successfully");
 		return "Room removed successfully";
-
 	}
 
 	@Override
@@ -180,16 +169,8 @@ public class RoomServiceImpl implements RoomService {
 			throw new HotelException("Hotel not found with id : " + hotelId);
 		Hotel hotel = opt.get();
 
-		/* Getting all rooms and filtering if available */
 		List<Room> rooms = hotel.getRooms().stream().filter(h -> h.getAvailable()).collect(Collectors.toList());
-
-		/*
-		 * Fetching current and future reservations out of all reservation of a
-		 * particular hotel
-		 */
 		List<Reservation> reservations = reservationDao.getPendingReservationsOfHotel(hotel);
-
-		/* Filtering out rooms that are not available for the provided dates */
 		for (Reservation r : reservations) {
 			for (Room room : rooms) {
 				if ((room.getRoomId() == r.getRoom().getRoomId())
@@ -204,22 +185,16 @@ public class RoomServiceImpl implements RoomService {
 
 		if (rooms.isEmpty())
 			throw new RoomException("Rooms not found in this hotel");
-
 		return rooms;
-
 	}
 
 	@Override
 	public List<Room> getAllRoomsByHotel() throws RoomException {
-
 		Hotel hotel = getCurrentLoggedInHotel();
-
 		List<Room> rooms = hotel.getRooms();
 		if (rooms.isEmpty())
 			throw new RoomException("No rooms found");
-
 		return rooms;
-
 	}
 
 	private Hotel getCurrentLoggedInHotel() {

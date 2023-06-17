@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,39 +21,37 @@ import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 import com.staywell.service.CustomerService;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
-	@Autowired
 	private CustomerDao customerDao;
-
-	@Autowired
 	private HotelDao hotelDao;
-
-	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException {
-
 		log.info("Performing email validation");
 		if (isEmailExists(customerDTO.getEmail())) {
 			throw new CustomerException("Customer is already exist ...!");
 		}
-		Customer customer = buildCustomer(customerDTO);
 
-		log.info("Registration in progress");
-		return customerDao.save(customer);
+		Customer customer = buildCustomer(customerDTO);
+		customerDao.save(customer);
+
+		log.info("Registration successfull");
+		return customer;
 	}
 
 	@Override
 	public String updateName(UpdateDetailsDTO updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
-		log.info("Checking credentials");
+		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
 			throw new HotelException("Wrong credentials!");
@@ -69,7 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public String updatePassword(UpdateDetailsDTO updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
-		log.info("Checking credentials");
+		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
 			throw new HotelException("Wrong credentials!");
@@ -85,7 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public String updatePhone(UpdateDetailsDTO updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
-		log.info("Checking credentials");
+		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
 			throw new HotelException("Wrong credentials!");
@@ -107,33 +104,27 @@ public class CustomerServiceImpl implements CustomerService {
 		if (!pendingReservations.isEmpty())
 			throw new CustomerException("Pending reservations! Account can't be deleted");
 
+		log.info("Setting Account status to be deleted");
 		currentCustomer.setToBeDeleted(true);
 		customerDao.save(currentCustomer);
+
 		log.info("Account schelduled for deletion and Logged out!");
 		return "Account schelduled for deletion. To recovered loggin again within 24 hours";
 	}
 
 	@Override
 	public List<Customer> getToBeDeletedCustomers() throws CustomerException {
-		log.info("Checking user accounts scheduled for deletion");
 		List<Customer> customers = customerDao.findByToBeDeleted(true);
-
 		if (!customers.isEmpty())
 			throw new CustomerException("Customers not exist");
-
-		log.info("Found user accounts scheduled for deletion");
 		return customers;
 	}
 
 	@Override
 	public Customer getCustomerById(Long customerId) throws CustomerException {
-		log.info("Fetching user details");
 		Optional<Customer> optional = customerDao.findById(customerId);
-
 		if (optional.isEmpty())
 			throw new CustomerException("Customer not exist by this Id : " + customerId);
-
-		log.info("Found user details");
 		return optional.get();
 	}
 
@@ -147,10 +138,17 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	private Customer buildCustomer(CustomerDTO customerDTO) {
-		return Customer.builder().name(customerDTO.getName()).email(customerDTO.getEmail())
-				.password(passwordEncoder.encode(customerDTO.getPassword())).phone(customerDTO.getPhone())
-				.gender(customerDTO.getGender()).registrationDateTime(LocalDateTime.now()).role(Role.ROLE_CUSTOMER)
-				.dob(customerDTO.getDob()).address(customerDTO.getAddress()).build();
+		return Customer.builder()
+				.name(customerDTO.getName())
+				.email(customerDTO.getEmail())
+				.password(passwordEncoder.encode(customerDTO.getPassword()))
+				.phone(customerDTO.getPhone())
+				.gender(customerDTO.getGender())
+				.registrationDateTime(LocalDateTime.now())
+				.role(Role.ROLE_CUSTOMER)
+				.dob(customerDTO.getDob())
+				.address(customerDTO.getAddress())
+				.build();
 	}
 
 }

@@ -26,9 +26,9 @@ import com.staywell.service.ReservationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
 @Service
 @Slf4j
+@AllArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
 	private ReservationDao reservationDao;
@@ -37,9 +37,8 @@ public class ReservationServiceImpl implements ReservationService {
 	private RoomDao roomDao;
 
 	@Override
-	public Reservation createReservation(Integer roomId, ReservationDTO reservationDTO, String paymentType, String txnId)
-			throws ReservationException, RoomException {
-
+	public Reservation createReservation(Integer roomId, ReservationDTO reservationDTO, String paymentType,
+			String txnId) throws ReservationException, RoomException {
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Room> opt = roomDao.findById(roomId);
@@ -54,16 +53,17 @@ public class ReservationServiceImpl implements ReservationService {
 
 		LocalDate checkIn = reservationDTO.getCheckinDate();
 		LocalDate checkOut = reservationDTO.getCheckinDate();
-		log.info("Checking if Room is available for : " + checkIn + " -> " + checkOut);
+		log.info("Checking Room availability for dates : " + checkIn + " -> " + checkOut);
 		for (Reservation r : reservations) {
 			if ((checkIn.isEqual(r.getCheckinDate()) || checkIn.isEqual(r.getCheckinDate()))
 					|| (checkOut.isEqual(r.getCheckinDate()) || checkOut.isEqual(r.getCheckinDate()))
 					|| (checkIn.isAfter(r.getCheckinDate()) && checkIn.isBefore(r.getCheckinDate()))
 					|| (checkOut.isAfter(r.getCheckinDate()) && checkOut.isBefore(r.getCheckinDate()))) {
-				throw new ReservationException("Room Not Available for this date!");
+				throw new ReservationException("Room not available for this date!");
 			}
 		}
 
+		log.info("Building Reservation");
 		Reservation reservation = buildReservation(reservationDTO);
 		reservation.setStatus(ReservationStatus.BOOKED);
 		reservation.setPayment(new Payment(PaymentType.valueOf(paymentType), txnId));
@@ -84,14 +84,12 @@ public class ReservationServiceImpl implements ReservationService {
 		reservation.setCustomer(customer);
 		customerDao.save(customer);
 
-		log.info("Reservation success");
+		log.info("Reservation successfull");
 		return reservation;
-
 	}
 
 	@Override
 	public String cancelReservation(Integer reservationId) throws ReservationException {
-
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Reservation> opt = reservationDao.findById(reservationId);
@@ -110,65 +108,51 @@ public class ReservationServiceImpl implements ReservationService {
 		curReservationsOfRoom.remove(reservation);
 		room.setReservations(curReservationsOfRoom);
 		roomDao.save(room);
-		
+
 		log.info("Removing reference of Reservation from Hotel");
 		Hotel hotel = reservation.getHotel();
 		List<Reservation> curReservationsOfHotel = hotel.getReservations();
 		curReservationsOfHotel.remove(reservation);
 		hotel.setReservations(curReservationsOfHotel);
 		hotelDao.save(hotel);
-		
+
 		log.info("Removing reference of Reservation from Customer");
 		List<Reservation> curReservationsOfCustomer = customer.getReservations();
 		curReservationsOfCustomer.remove(reservation);
 		customer.setReservations(curReservationsOfCustomer);
 		customerDao.save(customer);
-		
+
+		log.info("Deletion in progress");
 		reservationDao.delete(reservation);
 
-		log.info("Reservation cancelled successfully.");
+		log.info("Reservation cancelled successfully");
 		return "Reservation cancelled successfully";
-
 	}
 
 	@Override
 	public List<Reservation> getAllReservationsOfHotel() throws ReservationException {
-
 		Hotel hotel = getCurrentLoggedInHotel();
-
 		List<Reservation> reservations = reservationDao.findByHotel(hotel);
-
 		if (reservations.isEmpty())
 			throw new ReservationException("Reservations Not Found!");
-
 		return reservations;
-
 	}
 
 	@Override
 	public List<Reservation> getAllReservationsOfCustomer() throws ReservationException {
-
 		Customer customer = getCurrentLoggedInCustomer();
-
 		List<Reservation> reservations = reservationDao.findByCustomer(customer);
-
 		if (reservations.isEmpty())
 			throw new ReservationException("Reservations Not Found!");
-
 		return reservations;
-
 	}
 
 	@Override
 	public Reservation getReservationById(Integer ReservationId) throws ReservationException {
-
-		Optional<Reservation> reservation = reservationDao.findById(ReservationId);
-
-		if (reservation.isEmpty())
+		Optional<Reservation> optional = reservationDao.findById(ReservationId);
+		if (optional.isEmpty())
 			throw new ReservationException("Reservation not found with reservation id: " + ReservationId);
-
-		return reservation.get();
-
+		return optional.get();
 	}
 
 	private Hotel getCurrentLoggedInHotel() {
