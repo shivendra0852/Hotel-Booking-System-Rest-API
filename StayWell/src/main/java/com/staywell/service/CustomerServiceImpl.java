@@ -12,122 +12,122 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.staywell.dto.CustomerDTO;
+import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
 import com.staywell.repository.CustomerDao;
+
 @Service
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
 
+	@Autowired
+	private CustomerDao cDao;
 
-    @Autowired
-    private CustomerDao cDao;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
+	@Override
+	public Customer createCustomer(Customer customer) throws CustomerException {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Override
-    public Customer createCustomer(Customer customer) throws CustomerException {
+		customer.setPassword(passwordEncoder.encode(customer.getPassword()));
 
-            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+		Optional<Customer> customerExist = cDao.findByEmail(customer.getEmail());
 
-            Optional<Customer> customerExist =  cDao.findByEmail(customer.getEmail());
+		if (customerExist.isEmpty()) {
+			customer.setRole(Role.CUSTOMER);
 
-            if(customerExist.isEmpty()){
+			customer.setRegistrationDateTime(LocalDateTime.now());
 
-                    customer.setRegistrationDateTime(LocalDateTime.now());
+			customer.setReservations(new ArrayList<>());
 
-                    customer.setReservations( new ArrayList<>());
+			return cDao.save(customer);
+		}
 
-                    return cDao.save(customer);
-            }
+		else
+			throw new CustomerException("Customer is already exist ...!");
 
-            else throw new CustomerException("Customer is already exist ...!");
+	}
 
-    }
+	@Override
+	public Customer updateCustomer(CustomerDTO customerDto) throws CustomerException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String email = auth.getName();
 
-    @Override
-    public Customer updateCustomer(CustomerDTO customerDto) throws CustomerException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        
-        System.out.println(auth);
+		System.out.println(auth);
 
-        Optional<Customer> customerExist = cDao.findByEmail(email);
+		Optional<Customer> customerExist = cDao.findByEmail(email);
 
-        if (customerExist.isPresent()) {
-            Customer customer = customerExist.get();
+		if (customerExist.isPresent()) {
+			Customer customer = customerExist.get();
 
-            if (customerDto.getName() != null) {
-                customer.setName(customerDto.getName());
-            }
-            if (customerDto.getGender() != null) {
-                customer.setGender(customerDto.getGender());
-            }
-            if (customerDto.getDob() != null) {
-                customer.setDob(customerDto.getDob());
-            }
-            if (customerDto.getAddress() != null) {
-                customer.setAddress(customerDto.getAddress());
-            }
-            if (customerDto.getEmail() != null) {
-                customer.setEmail(customerDto.getEmail());
-            }
-            if (customerDto.getPhone() != null) {
-                customer.setPhone(customerDto.getPhone());
-            }
-            if (customerDto.getPassword() != null) {
-                customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
-            }
+			if (customerDto.getName() != null) {
+				customer.setName(customerDto.getName());
+			}
+			if (customerDto.getGender() != null) {
+				customer.setGender(customerDto.getGender());
+			}
+			if (customerDto.getDob() != null) {
+				customer.setDob(customerDto.getDob());
+			}
+			if (customerDto.getAddress() != null) {
+				customer.setAddress(customerDto.getAddress());
+			}
+			if (customerDto.getEmail() != null) {
+				customer.setEmail(customerDto.getEmail());
+			}
+			if (customerDto.getPhone() != null) {
+				customer.setPhone(customerDto.getPhone());
+			}
+			if (customerDto.getPassword() != null) {
+				customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
+			}
 
-            return cDao.save(customer);
-        } else {
-            throw new CustomerException("Customer does not exist");
-        }
-    }
+			return cDao.save(customer);
+		} else {
+			throw new CustomerException("Customer does not exist");
+		}
+	}
 
+	public Customer deleteCustomer(Authentication authentication) throws CustomerException {
+		String email = authentication.getName();
+		Optional<Customer> customerExist = cDao.findByEmail(email);
 
-    public Customer deleteCustomer(Authentication authentication) throws CustomerException {
-        String email = authentication.getName();
-        Optional<Customer> customerExist = cDao.findByEmail(email);
+		if (customerExist.isPresent()) {
+			Customer customer = customerExist.get();
+			cDao.delete(customer);
+			return customer;
+		} else {
+			throw new CustomerException("Customer does not exist");
+		}
+	}
 
-        if (customerExist.isPresent()) {
-            Customer customer = customerExist.get();
-            cDao.delete(customer);
-            return customer;
-        } else {
-            throw new CustomerException("Customer does not exist");
-        }
-    }
+	@Override
+	public List<Customer> getAllCustomer() throws CustomerException {
 
-    
-    
+		List<Customer> customers = cDao.findAll();
 
+		if (!customers.isEmpty()) {
 
-    @Override
-    public List<Customer> getAllCustomer() throws CustomerException {
+			return customers;
+		}
 
-        List<Customer> customers = cDao.findAll();
+		else
+			throw new CustomerException("Customers not exist");
+	}
 
-        if(!customers.isEmpty()){
+	@Override
+	public Customer getCustomerById(Integer id) throws CustomerException {
 
-            return customers;
-        }
+		Optional<Customer> customerExist = cDao.findById(id);
 
-        else throw new CustomerException("Customers not exist");
-    }
+		if (customerExist.isPresent()) {
 
-    @Override
-    public Customer getCustomerById(Integer id) throws CustomerException {
+			Customer customer = customerExist.get();
 
-        Optional<Customer> customerExist = cDao.findById(id);
+			return customer;
+		}
 
-        if(customerExist.isPresent()){
-
-            Customer customer = customerExist.get();
-
-            return customer;
-        }
-
-        else throw new CustomerException("Customer not exist by this Id : "+id);
-    }
+		else
+			throw new CustomerException("Customer not exist by this Id : " + id);
+	}
 }

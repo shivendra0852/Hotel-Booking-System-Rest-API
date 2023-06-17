@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.staywell.enums.Gender;
+import com.staywell.enums.Role;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,6 +20,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,12 +34,14 @@ import lombok.NoArgsConstructor;
 public class Customer {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer customerId;
-	
+	private Long customerId;
+
 	private String name;
 
-	@Column(unique = true)
+	@Column(unique = true) @Email
 	private String email;
+
+	private String password;
 
 	private String phone;
 
@@ -47,12 +50,11 @@ public class Customer {
 
 	private LocalDate dob;
 
-	private String password;
-
 	@Embedded
 	private Address address;
 
-	private String role;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 	private LocalDateTime registrationDateTime;
 
 	@JsonIgnore

@@ -47,7 +47,7 @@ public class HotelServiceImpl implements HotelService {
 		}
 
 		Hotel hotel = buildHotel(hotelDTO);
-		hotel.setRole("ROLE_" + (Role.HOTEL.toString()));
+		hotel.setRole(Role.CUSTOMER);
 
 		return hotelDao.save(hotel);
 	}

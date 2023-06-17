@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.staywell.enums.HotelType;
+import com.staywell.enums.Role;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,7 +51,8 @@ public class Hotel {
 	@Embedded
 	private Address address;
 
-	private String role;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> amenities = new ArrayList<>();

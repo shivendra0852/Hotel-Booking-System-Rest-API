@@ -35,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.staywell.dto.RoomDTO;
 import com.staywell.enums.HotelType;
+import com.staywell.enums.Role;
 import com.staywell.enums.RoomType;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Address;
@@ -85,8 +86,8 @@ public class RoomServiceTest {
 		feedbacks = new ArrayList<>();
 		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
-		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "9999999999", "9000000000", "1234", address,
-				"HOTEL", HotelType.HOTEL, amenities, rooms, reservations, feedbacks);
+		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@1234", "9999999999", "9000000000",
+				HotelType.HOTEL, address, Role.HOTEL, amenities, rooms, reservations, feedbacks);
 	}
 
 	@Test
@@ -134,9 +135,9 @@ public class RoomServiceTest {
 
 		Room room = new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations);
 		when(roomDao.findById(anyInt())).thenReturn(Optional.of(room));
-		
+
 		assertEquals(1, hotel.getRooms().size());
-		
+
 		doNothing().when(roomDao).delete(any());
 
 		String result = roomService.removeRoom(1001);
