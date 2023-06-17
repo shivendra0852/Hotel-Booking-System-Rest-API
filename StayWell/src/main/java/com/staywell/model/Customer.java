@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Customer {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonProperty(access = Access.READ_ONLY)
 	private Long customerId;
 
 	private String name;

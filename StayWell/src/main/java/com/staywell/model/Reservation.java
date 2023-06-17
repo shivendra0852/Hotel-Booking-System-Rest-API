@@ -13,6 +13,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,9 +29,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 public class Reservation {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@JsonProperty(access = Access.READ_ONLY)
+	
+	@Id @GeneratedValue(strategy = GenerationType.AUTO) @JsonProperty(access = Access.READ_ONLY)
 	private Integer reservationId;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd")
@@ -48,15 +48,15 @@ public class Reservation {
 	private ReservationStatus status;
 	
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Room room;
 	
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Hotel hotel;
 	
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Customer customer;
 	
 }

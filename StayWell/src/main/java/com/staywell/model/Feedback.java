@@ -1,6 +1,11 @@
 package com.staywell.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,15 +19,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Feedback {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonProperty(access = Access.READ_ONLY)
 	private Integer feedbackId;
-	
-	@ManyToOne
+
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Hotel hotel;
-	
-	@ManyToOne
+
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Customer customer;
+
 	private String feedbackContent;
-	private int rating;
+	private Integer rating;
+
 }

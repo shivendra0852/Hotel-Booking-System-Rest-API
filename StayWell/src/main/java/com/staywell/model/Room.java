@@ -30,25 +30,27 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 public class Room {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@JsonProperty(access = Access.READ_ONLY)
+
+	@Id @GeneratedValue(strategy = GenerationType.AUTO) @JsonProperty(access = Access.READ_ONLY)
 	private Integer roomId;
-	
+
 	private Integer roomNumber;
-	
+
 	@Enumerated(EnumType.STRING)
 	private RoomType roomType;
+
 	private Integer noOfPerson;
+
 	private BigDecimal price;
+
 	private Boolean available;
-	
+
 	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Hotel hotel;
-	
+
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "room", fetch = FetchType.EAGER)
 	private List<Reservation> reservations = new ArrayList<>();
-	
+
 }

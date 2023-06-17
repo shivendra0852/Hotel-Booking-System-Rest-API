@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Hotel {
 
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)	@JsonProperty(access = Access.READ_ONLY)
 	private Long hotelId;
 
 	private String name;
