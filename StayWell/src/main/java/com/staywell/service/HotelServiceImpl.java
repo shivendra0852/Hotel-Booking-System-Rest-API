@@ -36,32 +36,19 @@ public class HotelServiceImpl implements HotelService {
 	private ReservationDao reservationDao;
 
 	@Override
-	public Hotel registerHotel(HotelDTO hotelRequest) {
-		/* Checking if there exists a user or a hotel with the provided email */
-		if (isEmailExists(hotelRequest.getHotelEmail())) {
+	public Hotel registerHotel(HotelDTO hotelDTO) {
+
+		if (isEmailExists(hotelDTO.getHotelEmail())) {
 			throw new HotelException("This email is already registered. Please use a different email to register.");
 		}
 
-		if (hotelWithNameAlreadyExitsInYourCity(hotelRequest.getName(), hotelRequest.getAddress())) {
-			throw new HotelException("Hotel already exits in your city with name : " + hotelRequest.getName());
+		if (hotelWithNameAlreadyExitsInYourCity(hotelDTO.getName(), hotelDTO.getAddress())) {
+			throw new HotelException("Hotel already exits in your city with name : " + hotelDTO.getName());
 		}
 
-		/*
-		 * Creating a hotel object and mapping attributes from request DTO to hotel
-		 * entity
-		 */
-		Hotel hotel = new Hotel();
-		hotel.setName(hotelRequest.getName());
-		hotel.setHotelEmail(hotelRequest.getHotelEmail());
-		hotel.setHotelPhone(hotelRequest.getHotelPhone());
-		hotel.setHotelTelephone(hotelRequest.getHotelPhone());
-		hotel.setPassword(passwordEncoder.encode(hotelRequest.getPassword()));
-		hotel.setHotelType(hotelRequest.getHotelType());
+		Hotel hotel = buildHotel(hotelDTO);
 		hotel.setRole("ROLE_" + (Role.HOTEL.toString()));
-		hotel.setAddress(hotelRequest.getAddress());
 
-		System.out.println("Shivendra!");
-		/* Saving to the database */
 		return hotelDao.save(hotel);
 	}
 
@@ -71,7 +58,7 @@ public class HotelServiceImpl implements HotelService {
 		if (existence.isPresent()) {
 			return existence.get();
 		}
-		throw new HotelException("No hotel found with the id " + id);
+		throw new HotelException("No hotel found with id " + id);
 	}
 
 	@Override
@@ -171,6 +158,13 @@ public class HotelServiceImpl implements HotelService {
 		if (opt.isPresent())
 			return true;
 		return false;
+	}
+
+	private Hotel buildHotel(HotelDTO hotelDTO) {
+		return Hotel.builder().name(hotelDTO.getName()).hotelEmail(hotelDTO.getHotelEmail())
+				.hotelPhone(hotelDTO.getHotelPhone()).hotelTelephone(hotelDTO.getHotelTelephone())
+				.password(passwordEncoder.encode(hotelDTO.getPassword())).hotelType(hotelDTO.getHotelType())
+				.address(hotelDTO.getAddress()).build();
 	}
 
 }
