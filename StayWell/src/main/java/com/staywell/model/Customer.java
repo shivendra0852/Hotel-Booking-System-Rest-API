@@ -59,6 +59,7 @@ public class Customer {
 	@Enumerated(EnumType.STRING)
 	private Role role;
 	private LocalDateTime registrationDateTime;
+	private Boolean toBeDeleted = false;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)

@@ -1,23 +1,30 @@
 package com.staywell.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.staywell.dto.CustomerDTO;
+import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
+import com.staywell.exception.HotelException;
 import com.staywell.model.Customer;
+import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
@@ -32,96 +39,106 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException {
 
+		log.info("Performing email validation");
 		if (isEmailExists(customerDTO.getEmail())) {
 			throw new CustomerException("Customer is already exist ...!");
 		}
-
 		Customer customer = buildCustomer(customerDTO);
+
+		log.info("Registration in progress");
 		return customerDao.save(customer);
-
 	}
 
 	@Override
-	public Customer updateCustomer(CustomerDTO customerDto) throws CustomerException {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String email = auth.getName();
+	public String updateName(UpdateDetailsDTO updateRequest) {
+		Customer currentCustomer = getCurrentLoggedInCustomer();
 
-		System.out.println(auth);
-
-		Optional<Customer> customerExist = customerDao.findByEmail(email);
-
-		if (customerExist.isPresent()) {
-			Customer customer = customerExist.get();
-
-			if (customerDto.getName() != null) {
-				customer.setName(customerDto.getName());
-			}
-			if (customerDto.getGender() != null) {
-				customer.setGender(customerDto.getGender());
-			}
-			if (customerDto.getDob() != null) {
-				customer.setDob(customerDto.getDob());
-			}
-			if (customerDto.getAddress() != null) {
-				customer.setAddress(customerDto.getAddress());
-			}
-			if (customerDto.getEmail() != null) {
-				customer.setEmail(customerDto.getEmail());
-			}
-			if (customerDto.getPhone() != null) {
-				customer.setPhone(customerDto.getPhone());
-			}
-			if (customerDto.getPassword() != null) {
-				customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
-			}
-
-			return customerDao.save(customer);
-		} else {
-			throw new CustomerException("Customer does not exist");
+		log.info("Checking credentials");
+		String password = updateRequest.getPassword();
+		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
+			throw new HotelException("Wrong credentials!");
 		}
-	}
+		customerDao.setCustomerEmail(currentCustomer.getCustomerId(), updateRequest.getField());
 
-	public Customer deleteCustomer(Authentication authentication) throws CustomerException {
-		String email = authentication.getName();
-		Optional<Customer> customerExist = customerDao.findByEmail(email);
-
-		if (customerExist.isPresent()) {
-			Customer customer = customerExist.get();
-			customerDao.delete(customer);
-			return customer;
-		} else {
-			throw new CustomerException("Customer does not exist");
-		}
+		log.info("Updation successfull");
+		return "Name updated successfully!";
 	}
 
 	@Override
-	public List<Customer> getAllCustomer() throws CustomerException {
+	public String updatePassword(UpdateDetailsDTO updateRequest) {
+		Customer currentCustomer = getCurrentLoggedInCustomer();
 
-		List<Customer> customers = customerDao.findAll();
-
-		if (!customers.isEmpty()) {
-
-			return customers;
+		log.info("Checking credentials");
+		String password = updateRequest.getPassword();
+		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
+			throw new HotelException("Wrong credentials!");
 		}
+		customerDao.setCustomerPassword(currentCustomer.getCustomerId(),
+				passwordEncoder.encode(updateRequest.getField()));
 
-		else
+		log.info("Updation successfull");
+		return "Password updated successfully!";
+	}
+
+	@Override
+	public String updatePhone(UpdateDetailsDTO updateRequest) {
+		Customer currentCustomer = getCurrentLoggedInCustomer();
+
+		log.info("Checking credentials");
+		String password = updateRequest.getPassword();
+		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
+			throw new HotelException("Wrong credentials!");
+		}
+		customerDao.setCustomerPhone(currentCustomer.getCustomerId(), updateRequest.getField());
+
+		log.info("Updation successfull");
+		return "Phone updated successfully!";
+	}
+
+	public String deleteCustomer() throws CustomerException {
+		Customer currentCustomer = getCurrentLoggedInCustomer();
+		List<Reservation> reservations = currentCustomer.getReservations();
+		List<Reservation> pendingReservations = reservations.stream().filter(
+				r -> r.getCheckoutDate().isAfter(LocalDate.now()) || r.getCheckoutDate().isEqual(LocalDate.now()))
+				.collect(Collectors.toList());
+
+		log.info("Checking for any pending reservations");
+		if (!pendingReservations.isEmpty())
+			throw new CustomerException("Pending reservations! Account can't be deleted");
+
+		currentCustomer.setToBeDeleted(true);
+		customerDao.save(currentCustomer);
+		log.info("Account schelduled for deletion and Logged out!");
+		return "Account schelduled for deletion. To recovered loggin again within 24 hours";
+	}
+
+	@Override
+	public List<Customer> getToBeDeletedCustomers() throws CustomerException {
+		log.info("Checking user accounts scheduled for deletion");
+		List<Customer> customers = customerDao.findByToBeDeleted(true);
+
+		if (!customers.isEmpty())
 			throw new CustomerException("Customers not exist");
+
+		log.info("Found user accounts scheduled for deletion");
+		return customers;
 	}
 
 	@Override
 	public Customer getCustomerById(Long customerId) throws CustomerException {
+		log.info("Fetching user details");
+		Optional<Customer> optional = customerDao.findById(customerId);
 
-		Optional<Customer> customerExist = customerDao.findById(customerId);
-
-		if (customerExist.isPresent()) {
-
-			Customer customer = customerExist.get();
-
-			return customer;
-		}
-
-		else
+		if (optional.isEmpty())
 			throw new CustomerException("Customer not exist by this Id : " + customerId);
+
+		log.info("Found user details");
+		return optional.get();
+	}
+
+	private Customer getCurrentLoggedInCustomer() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		return customerDao.findByEmail(email).get();
 	}
 
 	private boolean isEmailExists(String email) {
