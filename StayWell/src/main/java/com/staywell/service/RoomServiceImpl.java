@@ -186,7 +186,7 @@ public class RoomServiceImpl implements RoomService {
 		 * Fetching current and future reservations out of all reservation of a
 		 * particular hotel
 		 */
-		List<Reservation> reservations = reservationDao.getAllPendingReservations(hotel);
+		List<Reservation> reservations = reservationDao.getPendingReservationsOfHotel(hotel);
 
 		/* Filtering out rooms that are not available for the provided dates */
 		for (Reservation r : reservations) {
