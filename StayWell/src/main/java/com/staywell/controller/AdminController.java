@@ -12,7 +12,7 @@ import com.staywell.model.Admin;
 import com.staywell.service.AdminService;
 
 @RestController
-@RequestMapping("/staywell/admin")
+@RequestMapping("/staywell/admins")
 public class AdminController {
 	@Autowired
 	private AdminService adminService;

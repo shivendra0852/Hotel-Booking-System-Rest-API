@@ -20,50 +20,55 @@ import com.staywell.service.HotelService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/staywell/hotels")
+@AllArgsConstructor
 public class HotelController {
 
 	private HotelService hotelService;
-	
+
 	@PostMapping("/register")
-	public ResponseEntity<Hotel> registerHotel(@Valid @RequestBody HotelDTO hotelRequest){	
-		return new ResponseEntity<Hotel>(hotelService.registerHotel(hotelRequest), HttpStatus.CREATED);		
+	public ResponseEntity<Hotel> registerHotel(@Valid @RequestBody HotelDTO hotelRequest) {
+		return new ResponseEntity<Hotel>(hotelService.registerHotel(hotelRequest), HttpStatus.CREATED);
 	}
 
-	@GetMapping("/hotel/{hotelId}")
-	public ResponseEntity<Hotel> getHotelById(@PathVariable("hotelId") long hotelId){
+	@PutMapping("/update-name")
+	public ResponseEntity<String> updateName(@RequestBody UpdateDetailsDTO updateDetailsRequest) {
+		return new ResponseEntity<>(hotelService.updateName(updateDetailsRequest), HttpStatus.ACCEPTED);
+	}
+
+	@PutMapping("/update-phone")
+	public ResponseEntity<String> updatePhone(@RequestBody UpdateDetailsDTO updateDetailsRequest) {
+		return new ResponseEntity<>(hotelService.updatePhone(updateDetailsRequest), HttpStatus.ACCEPTED);
+	}
+
+	@PutMapping("/update-telephone")
+	public ResponseEntity<String> updateTelephone(@RequestBody UpdateDetailsDTO updateDetailsRequest) {
+		return new ResponseEntity<>(hotelService.updateTelephone(updateDetailsRequest), HttpStatus.ACCEPTED);
+	}
+
+	@PutMapping("/update-hoteltype")
+	public ResponseEntity<String> updateHotelType(@RequestBody UpdateDetailsDTO updateDetailsRequest) {
+		return new ResponseEntity<>(hotelService.updateHotelType(updateDetailsRequest), HttpStatus.ACCEPTED);
+	}
+
+	@GetMapping("/getHotelById/{hotelId}")
+	public ResponseEntity<Hotel> getHotelById(@PathVariable("hotelId") long hotelId) {
 		return new ResponseEntity<Hotel>(hotelService.getHotelById(hotelId), HttpStatus.FOUND);
 	}
-	@PutMapping("/update-name")
-	public ResponseEntity<Hotel> updateName(@RequestBody UpdateDetailsDTO updateDetailsRequest){
-		return new ResponseEntity<Hotel>(hotelService.updateName(updateDetailsRequest), HttpStatus.ACCEPTED);
-	}
-	
-	@PutMapping("/update-email")
-	public ResponseEntity<Hotel> updateEmail(@RequestBody UpdateDetailsDTO updateDetailsRequest){
-		return new ResponseEntity<Hotel>(hotelService.updateEmail(updateDetailsRequest), HttpStatus.ACCEPTED);
-	}
-	@PutMapping("/update-phone")
-	public ResponseEntity<Hotel> updatePhone(@RequestBody UpdateDetailsDTO updateDetailsRequest){
-		return new ResponseEntity<Hotel>(hotelService.updatePhone(updateDetailsRequest), HttpStatus.ACCEPTED);
-	}
-	@PutMapping("/update-telephone")
-	public ResponseEntity<Hotel> updateTelephone(@RequestBody UpdateDetailsDTO updateDetailsRequest){
-		return new ResponseEntity<Hotel>(hotelService.updateTelephone(updateDetailsRequest), HttpStatus.ACCEPTED);
-	}
-	
-	@GetMapping("near-me")
+
+	@GetMapping("/near-me")
 	public ResponseEntity<List<Hotel>> getHotelsNearMe() {
-		ResponseEntity<List<Hotel>> responseEntity = new ResponseEntity<>(hotelService.getHotelsNearMe(), HttpStatus.FOUND);
-		return responseEntity;		
+		ResponseEntity<List<Hotel>> responseEntity = new ResponseEntity<>(hotelService.getHotelsNearMe(),
+				HttpStatus.FOUND);
+		return responseEntity;
 	}
-	
-	@GetMapping("in-city/{city}")
+
+	@GetMapping("/in-city/{city}")
 	public ResponseEntity<List<Hotel>> getHotelsInCity(@PathVariable String city) {
-		ResponseEntity<List<Hotel>> responseEntity = new ResponseEntity<>(hotelService.getHotelsInCity(city), HttpStatus.FOUND);
-		return responseEntity;		
+		ResponseEntity<List<Hotel>> responseEntity = new ResponseEntity<>(hotelService.getHotelsInCity(city),
+				HttpStatus.FOUND);
+		return responseEntity;
 	}
-	
+
 }

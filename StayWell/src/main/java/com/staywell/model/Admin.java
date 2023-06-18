@@ -2,6 +2,7 @@ package com.staywell.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.Role;
@@ -41,7 +42,7 @@ public class Admin {
 	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 
-	@NotNull @NotEmpty @NotBlank
+	@JsonIgnore
 	@Enumerated(EnumType.STRING)
 	private Role role;
 	

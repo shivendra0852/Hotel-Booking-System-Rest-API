@@ -16,17 +16,17 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/staywell")
 public class LogoutController {
 
-    @PostMapping("/admin/logout")
+    @PostMapping("/admins/logout")
     public ResponseEntity<String> adminLogoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         return performLogout(request, response, auth);
     }
 
-    @PostMapping("/customer/logout")
+    @PostMapping("/customers/logout")
     public ResponseEntity<String> customerLogoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         return performLogout(request, response, auth);
     }
 
-    @PostMapping("/hotel/logout")
+    @PostMapping("/hotels/logout")
     public ResponseEntity<String> hotelLogoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
         return performLogout(request, response, auth);
     }

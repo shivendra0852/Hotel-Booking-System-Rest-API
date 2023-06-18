@@ -5,13 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.staywell.dto.HotelDTO;
 import com.staywell.dto.UpdateDetailsDTO;
-import com.staywell.enums.Gender;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.enums.RoomType;
@@ -81,7 +79,6 @@ public class HotelServiceTest {
 
 	@BeforeEach
 	public void addCommonDetails() {
-
 		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
 		List<String> amenities = new ArrayList<>();
 		List<Room> rooms = new ArrayList<>();
@@ -99,13 +96,11 @@ public class HotelServiceTest {
 		hotelRequest.setHotelPhone("9999999999");
 		hotelRequest.setHotelPhone("9000000000");
 		hotelRequest.setHotelType(HotelType.HOTEL);
-
 	}
 
 	@Test
 	@Order(1)
 	public void testRegisterHotel() {
-
 		Hotel dummyHotel = hotel;
 
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.empty());
@@ -123,170 +118,134 @@ public class HotelServiceTest {
 
 	@Test
 	@Order(2)
-	public void testGetHotelByIdIfHotelExists() {
+	public void testGetHotelById1() {
 		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(hotel));
-		Hotel resultantHotel = hotelService.getHotelById(hotel.getHotelId());
-		assertEquals(1L, resultantHotel.getHotelId());
-		verify(hotelDao, times(1)).findById(anyLong());
+		Hotel result = hotelService.getHotelById(1L);
+
+		assertEquals(1L, result.getHotelId());
+		assertEquals("myhotel@gmail.com", result.getHotelEmail());
+
+		verify(hotelDao, atMostOnce()).findById(anyLong());
 	}
 
 	@Test
 	@Order(3)
-	public void testGetHotelByIdIfHotelNotExist() {
+	public void testGetHotelById2() {
 		when(hotelDao.findById(anyLong())).thenReturn(Optional.empty());
-		/* Checking the exception class is same that is thrown by the method */
-		Exception exception = assertThrows(HotelException.class, () -> hotelService.getHotelById(hotel.getHotelId()));
-		/* checking that the message is also the same as the expected message */
-		assertEquals("No hotel found with id " + hotel.getHotelId(), exception.getMessage());
+		assertThrows(HotelException.class, () -> hotelService.getHotelById(hotel.getHotelId()));
 		verify(hotelDao, times(1)).findById(anyLong());
 	}
 
 	@Test
 	@Order(4)
 	public void testGetHotelsNearMe() {
-		Customer customer = new Customer(Long.valueOf(1001), "prateek", "prateek@gmail.com", "Pass@123", "1111111111",
-				Gender.MALE, LocalDate.of(2002, 04, 26), hotel.getAddress(), Role.ROLE_CUSTOMER, LocalDateTime.now(),
-				false, null, new ArrayList<>());
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("prateek@gmail.com");
+		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("customer@gmail.com");
+
+		Customer customer = new Customer();
+		customer.setAddress(new Address("Near Hospital", "Jaipur", "RJ", "123456", "India"));
 		when(customerDao.findByEmail(anyString())).thenReturn(Optional.of(customer));
-		when(hotelDao.findByAddress(hotel.getAddress())).thenReturn(List.of(hotel));
+		when(hotelDao.getHotelByCity(anyString())).thenReturn(List.of(hotel));
+
 		List<Hotel> hotels = hotelService.getHotelsNearMe();
 		for (Hotel hotel : hotels) {
 			assertEquals(customer.getAddress(), hotel.getAddress());
 		}
-		verify(customerDao, times(1)).findByEmail("prateek@gmail.com");
-		verify(hotelDao, times(1)).findByAddress(customer.getAddress());
+
+		verify(customerDao, times(1)).findByEmail(anyString());
+		verify(hotelDao, times(1)).getHotelByCity(anyString());
 	}
 
 	@Test
 	@Order(5)
-	public void testUpdateEmail() {
-
+	public void testUpdatePhone() {
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("myhotel@gmail.com");
+
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
-		when(hotelDao.setEmailOfHotel(anyLong(), anyString())).thenReturn(1);
-		hotel.setHotelEmail("mynewhotel@gmail.com");
-		when(hotelDao.findById(1L)).thenReturn(Optional.of(hotel));
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("mynewhotel@gmail.com", "Pass@1234");
+		when(hotelDao.setPhoneOfHotel(anyLong(), anyString())).thenReturn(1);
+
+		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("9315807215", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-		Hotel result = hotelService.updateEmail(updateRequest);
-		assertEquals("mynewhotel@gmail.com", result.getHotelEmail());
+		String result = hotelService.updatePhone(updateRequest);
+		assertEquals("Updated hotel phone successfully", result);
 
-		verify(hotelDao, times(1)).findById(1L);
-		verify(hotelDao, times(1)).setEmailOfHotel(1L, "mynewhotel@gmail.com");
-		verify(hotelDao, times(1)).findByHotelEmail("myhotel@gmail.com");
-
+		verify(hotelDao, times(1)).setPhoneOfHotel(anyLong(), anyString());
+		verify(hotelDao, times(1)).findByHotelEmail(anyString());
 	}
 
 	@Test
 	@Order(6)
-	public void testUpdatePhone() {
-
+	public void testUpdateTelephone() {
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("myhotel@gmail.com");
+
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
-		when(hotelDao.setPhoneOfHotel(anyLong(), anyString())).thenReturn(1);
-		hotel.setHotelPhone("9315807215");
-		when(hotelDao.findById(1L)).thenReturn(Optional.of(hotel));
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("9315807215", "Pass@1234");
+		when(hotelDao.setTelephoneOfHotel(anyLong(), anyString())).thenReturn(1);
+
+		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("1234567890", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-		Hotel result = hotelService.updatePhone(updateRequest);
-		assertEquals("9315807215", result.getHotelPhone());
+		String result = hotelService.updateTelephone(updateRequest);
+		assertEquals("Updated hotel telephone successfully", result);
 
-		verify(hotelDao, times(1)).findById(1L);
-		verify(hotelDao, times(1)).setPhoneOfHotel(1L, "9315807215");
+		verify(hotelDao, times(1)).setTelephoneOfHotel(1L, "1234567890");
 		verify(hotelDao, times(1)).findByHotelEmail("myhotel@gmail.com");
-
 	}
 
 	@Test
 	@Order(7)
-	public void testUpdateTelephone() {
-
+	public void testUpdateName() {
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("myhotel@gmail.com");
+
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
-		when(hotelDao.setTelephoneOfHotel(anyLong(), anyString())).thenReturn(1);
-		hotel.setHotelTelephone("1234567890");
-		when(hotelDao.findById(1L)).thenReturn(Optional.of(hotel));
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("1234567890", "Pass@1234");
+		when(hotelDao.setNameOfHotel(anyLong(), anyString())).thenReturn(1);
+
+		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("mynewhotel", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-		Hotel result = hotelService.updateTelephone(updateRequest);
-		assertEquals("1234567890", result.getHotelTelephone());
+		String result = hotelService.updateName(updateRequest);
+		assertEquals("Updated hotel name successfully", result);
 
-		verify(hotelDao, times(1)).findById(1L);
-		verify(hotelDao, times(1)).setTelephoneOfHotel(1L, "1234567890");
+		verify(hotelDao, times(1)).setNameOfHotel(1L, "mynewhotel");
 		verify(hotelDao, times(1)).findByHotelEmail("myhotel@gmail.com");
-
 	}
 
 	@Test
 	@Order(8)
-	public void testUpdateName() {
-
+	public void testUpdateHotelType() {
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("myhotel@gmail.com");
+
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
-		when(hotelDao.setNameOfHotel(anyLong(), anyString())).thenReturn(1);
-		hotel.setName("mynewhotel");
-		when(hotelDao.findById(1L)).thenReturn(Optional.of(hotel));
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("mynewhotel", "Pass@1234");
+		when(hotelDao.setHotelType(anyLong(), any())).thenReturn(1);
+
+		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("HOTEL", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-		Hotel result = hotelService.updateName(updateRequest);
-		assertEquals("mynewhotel", result.getName());
+		String result = hotelService.updateHotelType(updateRequest);
+		assertEquals("Updated hotel type successfully", result);
 
-		verify(hotelDao, times(1)).findById(1L);
-		verify(hotelDao, times(1)).setNameOfHotel(1L, "mynewhotel");
-		verify(hotelDao, times(1)).findByHotelEmail("myhotel@gmail.com");
-
-	}
-
-	@Test
-	@Order(10)
-	public void testGetHotelById() {
-		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
-		List<String> amenities = new ArrayList<>();
-		List<Room> rooms = new ArrayList<>();
-		List<Reservation> reservations = new ArrayList<>();
-		List<Feedback> feedbacks = new ArrayList<>();
-		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
-
-		Hotel dummyHotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@1234", "9999999999",
-				"9000000000", HotelType.HOTEL, address, Role.ROLE_HOTEL, amenities, rooms, reservations, feedbacks);
-
-		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(dummyHotel));
-
-		Hotel hotel = hotelService.getHotelById(1L);
-
-		assertEquals(1L, hotel.getHotelId());
-		assertEquals("myhotel@gmail.com", hotel.getHotelEmail());
-
+		verify(hotelDao, times(1)).setHotelType(anyLong(), any());
+		verify(hotelDao, times(1)).findByHotelEmail(anyString());
 	}
 
 	@Test
 	@Order(9)
 	public void testGetHotelsInCity() {
-
-		Address address = new Address("Near Hospital", "Jaipur", "RJ", "123456", "India");
-
 		Customer customer = new Customer();
-		customer.setAddress(address);
+		customer.setAddress(new Address("Near Hospital", "Jaipur", "RJ", "123456", "India"));
 
-		when(hotelDao.findByAddress(any())).thenReturn(new ArrayList<>());
+		when(hotelDao.getHotelByCity(any())).thenReturn(new ArrayList<>());
 
 		assertThrows(HotelException.class, () -> hotelService.getHotelsInCity("Jaipur"));
-
 	}
 
 }

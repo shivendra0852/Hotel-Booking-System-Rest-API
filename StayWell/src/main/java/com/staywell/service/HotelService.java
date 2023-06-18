@@ -9,21 +9,19 @@ import com.staywell.model.Hotel;
 public interface HotelService {
 
 	public Hotel registerHotel(HotelDTO hotelRequest);
-	
+
+	public String updateName(UpdateDetailsDTO updateRequest);
+
+	public String updatePhone(UpdateDetailsDTO updateRequest);
+
+	public String updateTelephone(UpdateDetailsDTO updateRequest);
+
+	public String updateHotelType(UpdateDetailsDTO updateRequest);
+
 	public Hotel getHotelById(Long id);
-	
-	public Hotel updateEmail(UpdateDetailsDTO updateRequest);
-	
-	public Hotel updateName(UpdateDetailsDTO updateRequest);
-	
-	public Hotel updatePhone(UpdateDetailsDTO updateRequest);
-	
-	public Hotel updateTelephone(UpdateDetailsDTO updateRequest);
-	
-	public boolean deactivateHotelAccount();
-	
+
 	public List<Hotel> getHotelsNearMe();
-	
+
 	public List<Hotel> getHotelsInCity(String city);
-	
+
 }

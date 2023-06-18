@@ -1,23 +1,24 @@
 package com.staywell.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.HotelDTO;
 import com.staywell.dto.UpdateDetailsDTO;
+import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.exception.HotelException;
 import com.staywell.model.Address;
 import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
-import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
 import com.staywell.repository.HotelDao;
-import com.staywell.repository.ReservationDao;
 import com.staywell.service.HotelService;
 
 import lombok.AllArgsConstructor;
@@ -26,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Transactional
 public class HotelServiceImpl implements HotelService {
 
 	private HotelDao hotelDao;
 	private CustomerDao customerDao;
 	private PasswordEncoder passwordEncoder;
-	private ReservationDao reservationDao;
 
 	@Override
 	public Hotel registerHotel(HotelDTO hotelDTO) {
@@ -54,22 +55,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Hotel updateEmail(UpdateDetailsDTO updateRequest) {
-		Hotel currentHotel = getCurrentLoggedInHotel();
-
-		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
-		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
-			throw new HotelException("Wrong credentials!");
-		}
-		hotelDao.setEmailOfHotel(currentHotel.getHotelId(), updateRequest.getField());
-
-		log.info("Updation successfull");
-		return hotelDao.findById(currentHotel.getHotelId()).get();
-	}
-
-	@Override
-	public Hotel updateName(UpdateDetailsDTO updateRequest) {
+	public String updateName(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -80,11 +66,11 @@ public class HotelServiceImpl implements HotelService {
 		hotelDao.setNameOfHotel(currentHotel.getHotelId(), updateRequest.getField());
 
 		log.info("Updation successfull");
-		return hotelDao.findById(currentHotel.getHotelId()).get();
+		return "Updated hotel name successfully";
 	}
 
 	@Override
-	public Hotel updatePhone(UpdateDetailsDTO updateRequest) {
+	public String updatePhone(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -95,11 +81,11 @@ public class HotelServiceImpl implements HotelService {
 		hotelDao.setPhoneOfHotel(currentHotel.getHotelId(), updateRequest.getField());
 
 		log.info("Updation successfull");
-		return hotelDao.findById(currentHotel.getHotelId()).get();
+		return "Updated hotel phone successfully";
 	}
 
 	@Override
-	public Hotel updateTelephone(UpdateDetailsDTO updateRequest) {
+	public String updateTelephone(UpdateDetailsDTO updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -110,33 +96,21 @@ public class HotelServiceImpl implements HotelService {
 		hotelDao.setTelephoneOfHotel(currentHotel.getHotelId(), updateRequest.getField());
 
 		log.info("Updation successfull");
-		return hotelDao.findById(currentHotel.getHotelId()).get();
+		return "Updated hotel telephone successfully";
 	}
 
 	@Override
-	public boolean deactivateHotelAccount() {
-		Hotel currentHotel = getCurrentLoggedInHotel();
-		reservationDao.updateReservationStatus(currentHotel);
+	public String updateHotelType(UpdateDetailsDTO updateRequest) {
+		Hotel hotel = getCurrentLoggedInHotel();
 
-		log.info("Checking for pending reservations");
-		List<Reservation> reservations = reservationDao.getPendingReservationsOfHotel(currentHotel);
-		if (!reservations.isEmpty())
-			throw new HotelException("Hotel " + currentHotel.getName()
-					+ " has reservations booked for the future. Please serve/cancel those reservations before deleting the account.");
-
-		log.info("Removing reference of Hotel and Rooms from Reservations");
-		List<Reservation> allReservations = currentHotel.getReservations();
-		for (Reservation r : allReservations) {
-			r.setHotel(null);
-			r.setRoom(null);
-			reservationDao.save(r);
+		log.info("Verifying credentials");
+		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+			throw new HotelException("Wrong credentials!");
 		}
+		hotelDao.setHotelType(hotel.getHotelId(), HotelType.valueOf(updateRequest.getField()));
 
-		log.info("Deletion in progress");
-		hotelDao.delete(currentHotel);
-
-		log.info("Hotel deletion successfull");
-		return true;
+		log.info("Updation successfull");
+		return "Updated hotel type successfully";
 	}
 
 	@Override
@@ -150,7 +124,7 @@ public class HotelServiceImpl implements HotelService {
 	@Override
 	public List<Hotel> getHotelsNearMe() {
 		Customer customer = getCurrentLoggedInCustomer();
-		List<Hotel> hotels = hotelDao.findByAddress(customer.getAddress());
+		List<Hotel> hotels = hotelDao.getHotelByCity(customer.getAddress().getCity());
 		if (hotels.isEmpty())
 			throw new HotelException("Hotels Not Found In Your Area!");
 		return hotels;
@@ -158,9 +132,7 @@ public class HotelServiceImpl implements HotelService {
 
 	@Override
 	public List<Hotel> getHotelsInCity(String city) {
-		Address address = new Address();
-		address.setCity(city);
-		List<Hotel> hotels = hotelDao.findByAddress(address);
+		List<Hotel> hotels = hotelDao.getHotelByCity(city);
 		if (hotels.isEmpty())
 			throw new HotelException("Hotels Not Found In Your Area!");
 		return hotels;
@@ -181,7 +153,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	private boolean hotelWithNameAlreadyExitsInYourCity(String name, Address address) {
-		Optional<Hotel> opt = hotelDao.findByNameAndAddress(name, address);
+		Optional<Hotel> opt = hotelDao.getHotelByNameAndCity(name, address.getCity());
 		if (opt.isPresent())
 			return true;
 		return false;
@@ -197,6 +169,7 @@ public class HotelServiceImpl implements HotelService {
 				.role(Role.ROLE_HOTEL)
 				.hotelType(hotelDTO.getHotelType())
 				.address(hotelDTO.getAddress())
+				.amenities(new ArrayList<>()).rooms(new ArrayList<>()).reservations(new ArrayList<>()).feedbacks(new ArrayList<>())
 				.build();
 	}
 

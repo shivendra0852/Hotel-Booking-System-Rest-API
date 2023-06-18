@@ -7,32 +7,33 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import com.staywell.model.Address;
+import com.staywell.enums.HotelType;
 import com.staywell.model.Hotel;
 
-public interface HotelDao extends JpaRepository<Hotel, Long>{
+public interface HotelDao extends JpaRepository<Hotel, Long> {
 
 	Optional<Hotel> findByHotelEmail(String email);
-	
-	@Modifying
-	@Query("update Hotel set hotelEmail=?2 where hotelId=?1")
-	Integer setEmailOfHotel(Long id, String email);
 
 	@Modifying
 	@Query("update Hotel set hotelPhone=?2 where hotelId=?1")
-	Integer setPhoneOfHotel(Long id, String phone);
+	Integer setPhoneOfHotel(Long hotelId, String phone);
 
 	@Modifying
 	@Query("update Hotel set hotelTelephone=?2 where hotelId=?1")
-	Integer setTelephoneOfHotel(Long id, String telephone);
- 
+	Integer setTelephoneOfHotel(Long hotelId, String telephone);
+
 	@Modifying
 	@Query("update Hotel set name=?2 where hotelId=?1")
-	Integer setNameOfHotel(Long id, String name);
-	
-	/*Overridden equals and hash code on city field*/
-	List<Hotel> findByAddress(Address address);
+	Integer setNameOfHotel(Long hotelId, String name);
 
-	Optional<Hotel> findByNameAndAddress(String name, Address address);
-	
+	@Modifying
+	@Query("update Hotel set hotelType=?2 where hotelId=?1")
+	Integer setHotelType(Long hotelId, HotelType hotelType);
+
+	@Query("select h from Hotel h where h.address.city=?1")
+	List<Hotel> getHotelByCity(String city);
+
+	@Query("select h from Hotel h where h.name=?1 and h.address.city=?2")
+	Optional<Hotel> getHotelByNameAndCity(String name, String city);
+
 }

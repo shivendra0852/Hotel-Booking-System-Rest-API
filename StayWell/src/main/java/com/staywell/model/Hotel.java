@@ -1,8 +1,8 @@
 package com.staywell.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.HotelType;
@@ -58,15 +58,18 @@ public class Hotel {
 	private Role role;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> amenities = new ArrayList<>();
+	private List<String> amenities;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<Room> rooms = new ArrayList<>();
+	private List<Room> rooms;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<Reservation> reservations = new ArrayList<>();
+	private List<Reservation> reservations;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<Feedback> feedbacks = new ArrayList<>();
+	private List<Feedback> feedbacks;
 
 }

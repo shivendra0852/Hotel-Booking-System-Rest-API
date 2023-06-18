@@ -43,7 +43,7 @@ public class HotelDTO {
 	@Valid
 	private Address address;
 
-	@NotNull @NotEmpty @NotBlank
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private HotelType hotelType;
 

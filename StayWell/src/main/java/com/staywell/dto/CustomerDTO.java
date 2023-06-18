@@ -34,11 +34,11 @@ public class CustomerDTO {
 	@NotNull @NotEmpty @NotBlank
     private String phone;
 
-	@NotNull @NotEmpty @NotBlank
+	@NotNull
 	@Enumerated(EnumType.STRING)
     private Gender gender;
 
-	@NotNull @NotEmpty @NotBlank
+	@NotNull
 	@JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dob;
 
