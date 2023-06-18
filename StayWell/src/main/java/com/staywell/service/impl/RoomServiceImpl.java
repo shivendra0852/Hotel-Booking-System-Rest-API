@@ -2,6 +2,7 @@ package com.staywell.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.RoomDTO;
 import com.staywell.dto.UpdateDetailsDTO;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Transactional
 public class RoomServiceImpl implements RoomService {
 
 	private PasswordEncoder passwordEncoder;
@@ -38,7 +41,6 @@ public class RoomServiceImpl implements RoomService {
 
 	@Override
 	public Room addRoom(RoomDTO roomDTO) throws RoomException {
-
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		List<Room> rooms = hotel.getRooms();
@@ -51,22 +53,22 @@ public class RoomServiceImpl implements RoomService {
 		}
 
 		Room room = buildRoom(roomDTO);
-		room = roomDao.save(room);
 
 		log.info("Assigning room to the Hotel : " + hotel.getName());
 		hotel.getRooms().add(room);
 		room.setHotel(hotel);
-		hotelDao.save(hotel);
+
+		roomDao.save(room);
 
 		log.info("Room saved successfully");
 		return room;
 	}
 
 	@Override
-	public String updateRoomType(UpdateDetailsDTO updateRequest, Integer roomId) {
+	public String updateRoomType(UpdateDetailsDTO updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
-		log.info("Verifying password for updation");
+		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
@@ -77,10 +79,10 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String updateNoOfPerson(UpdateDetailsDTO updateRequest, Integer roomId) {
+	public String updateNoOfPerson(UpdateDetailsDTO updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
-		log.info("Verifying password for updation");
+		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
@@ -91,24 +93,24 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String updatePrice(UpdateDetailsDTO updateRequest, Integer roomId) {
+	public String updatePrice(UpdateDetailsDTO updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
-		log.info("Verifying password for updation");
+		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
-		roomDao.setPrice(roomId, BigDecimal.valueOf(Long.valueOf(updateRequest.getField())));
+		roomDao.setPrice(roomId, BigDecimal.valueOf(Double.valueOf(updateRequest.getField())));
 
 		log.info("Updation successfull");
 		return "Updated Room Price to " + updateRequest.getField();
 	}
 
 	@Override
-	public String updateAvailable(UpdateDetailsDTO updateRequest, Integer roomId) {
+	public String updateAvailable(UpdateDetailsDTO updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
-		log.info("Verifying password for updation");
+		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
@@ -119,9 +121,15 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String removeRoom(Integer roomId) throws RoomException {
+	public String removeRoom(UpdateDetailsDTO updateRequest) throws RoomException {
 		Hotel hotel = getCurrentLoggedInHotel();
 
+		log.info("Verifying credentials");
+		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+			throw new HotelException("Wrong credentials!");
+		}
+		
+		Long roomId = Long.valueOf(updateRequest.getField());
 		Optional<Room> optional = roomDao.findById(roomId);
 		if (optional.isEmpty())
 			throw new RoomException("Room not found with Id : " + roomId);
@@ -145,13 +153,11 @@ public class RoomServiceImpl implements RoomService {
 		log.info("Removing reference of Room from every Reservation");
 		for (Reservation r : reservations) {
 			r.setRoom(null);
-			reservationDao.save(r);
 		}
 
 		log.info("Removing reference of Room from Hotel");
 		rooms.remove(room);
 		hotel.setRooms(rooms);
-		hotelDao.save(hotel);
 
 		log.info("Deletion in progress");
 		roomDao.delete(room);
@@ -210,6 +216,7 @@ public class RoomServiceImpl implements RoomService {
 				.noOfPerson(roomDTO.getNoOfPerson())
 				.price(roomDTO.getPrice())
 				.available(roomDTO.getAvailable())
+				.reservations(new ArrayList<>())
 				.build();
 	}
 

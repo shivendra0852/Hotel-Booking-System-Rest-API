@@ -54,8 +54,8 @@ public class CustomerController {
 	}
 
 	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteCustomer() {
-		String res = customerService.deleteCustomer();
+	public ResponseEntity<String> deleteCustomer(@RequestBody UpdateDetailsDTO updateRequest) {
+		String res = customerService.deleteCustomer(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 

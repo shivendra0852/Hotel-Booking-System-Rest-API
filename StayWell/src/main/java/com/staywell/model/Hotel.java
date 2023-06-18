@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
@@ -20,7 +19,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,7 +36,7 @@ public class Hotel {
 
 	private String name;
 
-	@Column(unique = true) @Email
+	@Column(unique = true)
 	private String hotelEmail;
 
 	@JsonProperty(access = Access.WRITE_ONLY)
@@ -61,15 +59,15 @@ public class Hotel {
 	private List<String> amenities;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
 	private List<Room> rooms;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
 	private List<Reservation> reservations;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
 	private List<Feedback> feedbacks;
 
 }

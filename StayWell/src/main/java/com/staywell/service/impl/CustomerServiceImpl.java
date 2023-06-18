@@ -2,6 +2,7 @@ package com.staywell.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,8 +18,10 @@ import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
 import com.staywell.exception.HotelException;
 import com.staywell.model.Customer;
+import com.staywell.model.DeleteReason;
 import com.staywell.model.Reservation;
 import com.staywell.repository.CustomerDao;
+import com.staywell.repository.DeleteReasonDao;
 import com.staywell.repository.HotelDao;
 import com.staywell.service.CustomerService;
 
@@ -34,6 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private CustomerDao customerDao;
 	private HotelDao hotelDao;
 	private PasswordEncoder passwordEncoder;
+	private DeleteReasonDao deleteReasonDao;
 
 	@Override
 	public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException {
@@ -95,8 +99,16 @@ public class CustomerServiceImpl implements CustomerService {
 		return "Phone updated successfully!";
 	}
 
-	public String deleteCustomer() throws CustomerException {
+	@Override
+	public String deleteCustomer(UpdateDetailsDTO updateRequest) throws CustomerException {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
+
+		log.info("Verifying credentials");
+		String password = updateRequest.getPassword();
+		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
+			throw new HotelException("Wrong credentials!");
+		}
+
 		List<Reservation> reservations = currentCustomer.getReservations();
 		List<Reservation> pendingReservations = reservations.stream().filter(
 				r -> r.getCheckoutDate().isAfter(LocalDate.now()) || r.getCheckoutDate().isEqual(LocalDate.now()))
@@ -110,6 +122,10 @@ public class CustomerServiceImpl implements CustomerService {
 		currentCustomer.setToBeDeleted(true);
 		currentCustomer.setDeletionScheduledAt(LocalDateTime.now());
 		customerDao.save(currentCustomer);
+		
+		DeleteReason deleteReason = new DeleteReason();
+		deleteReason.setReason(updateRequest.getField());
+		deleteReasonDao.save(deleteReason);
 
 		log.info("Account schelduled for deletion and Logged out!");
 		return "Account schelduled for deletion. To recovered loggin again within 24 hours";
@@ -152,6 +168,7 @@ public class CustomerServiceImpl implements CustomerService {
 				.dob(customerDTO.getDob())
 				.address(customerDTO.getAddress())
 				.toBeDeleted(false)
+				.reservations(new ArrayList<>())
 				.build();
 	}
 

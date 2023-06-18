@@ -15,15 +15,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReservationDTO {
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	@FutureOrPresent
 	private LocalDate checkinDate;
-	
-	@JsonFormat(pattern = "yyyy-MM-dd")
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	@FutureOrPresent
 	private LocalDate checkoutDate;
-	
+
 	@Min(1)
 	private Integer noOfPerson;
-	
+
 }

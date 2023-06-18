@@ -17,7 +17,7 @@ public interface CustomerService {
 
 	public String updatePhone(UpdateDetailsDTO updateRequest);
 
-	public String deleteCustomer() throws CustomerException;
+	public String deleteCustomer(UpdateDetailsDTO updateRequest) throws CustomerException;
 
 	public List<Customer> getToBeDeletedCustomers() throws CustomerException;
 

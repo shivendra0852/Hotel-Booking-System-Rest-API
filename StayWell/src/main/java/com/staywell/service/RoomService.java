@@ -12,15 +12,15 @@ public interface RoomService {
 
 	public Room addRoom(RoomDTO roomDTO) throws RoomException;
 	
-	public String updateRoomType(UpdateDetailsDTO updateRequest, Integer roomId);
+	public String updateRoomType(UpdateDetailsDTO updateRequest, Long roomId);
 	
-	public String updateNoOfPerson(UpdateDetailsDTO updateRequest, Integer roomId);
+	public String updateNoOfPerson(UpdateDetailsDTO updateRequest, Long roomId);
 	
-	public String updatePrice(UpdateDetailsDTO updateRequest, Integer roomId);
+	public String updatePrice(UpdateDetailsDTO updateRequest, Long roomId);
 	
-	public String updateAvailable(UpdateDetailsDTO updateRequest, Integer roomId);
+	public String updateAvailable(UpdateDetailsDTO updateRequest, Long roomId);
 	
-	public String removeRoom(Integer roomId) throws RoomException;
+	public String removeRoom(UpdateDetailsDTO updateRequest) throws RoomException;
 	
 	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut) throws RoomException;
 	

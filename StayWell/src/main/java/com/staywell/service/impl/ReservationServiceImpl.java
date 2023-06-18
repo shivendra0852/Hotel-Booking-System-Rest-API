@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.ReservationDTO;
 import com.staywell.enums.PaymentType;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Transactional
 public class ReservationServiceImpl implements ReservationService {
 
 	private ReservationDao reservationDao;
@@ -37,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private RoomDao roomDao;
 
 	@Override
-	public Reservation createReservation(Integer roomId, ReservationDTO reservationDTO, String paymentType,
+	public Reservation createReservation(Long roomId, ReservationDTO reservationDTO, String paymentType,
 			String txnId) throws ReservationException, RoomException {
 		Customer customer = getCurrentLoggedInCustomer();
 
@@ -65,31 +67,28 @@ public class ReservationServiceImpl implements ReservationService {
 
 		log.info("Building Reservation");
 		Reservation reservation = buildReservation(reservationDTO);
-		reservation.setStatus(ReservationStatus.BOOKED);
 		reservation.setPayment(new Payment(PaymentType.valueOf(paymentType), txnId));
-		reservationDao.save(reservation);
 
 		log.info("Assigning Reservation to the Room : " + roomId);
 		room.getReservations().add(reservation);
 		reservation.setRoom(room);
-		roomDao.save(room);
 
 		log.info("Assigning Reservation to the Hotel : " + hotel.getName());
 		hotel.getReservations().add(reservation);
 		reservation.setHotel(hotel);
-		hotelDao.save(hotel);
 
 		log.info("Assigning Reservation to the Customer : " + customer.getName());
 		customer.getReservations().add(reservation);
 		reservation.setCustomer(customer);
-		customerDao.save(customer);
+
+		reservationDao.save(reservation);
 
 		log.info("Reservation successfull");
 		return reservation;
 	}
 
 	@Override
-	public String cancelReservation(Integer reservationId) throws ReservationException {
+	public String cancelReservation(Long reservationId) throws ReservationException {
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Reservation> opt = reservationDao.findById(reservationId);
@@ -107,20 +106,17 @@ public class ReservationServiceImpl implements ReservationService {
 		List<Reservation> curReservationsOfRoom = room.getReservations();
 		curReservationsOfRoom.remove(reservation);
 		room.setReservations(curReservationsOfRoom);
-		roomDao.save(room);
 
 		log.info("Removing reference of Reservation from Hotel");
 		Hotel hotel = reservation.getHotel();
 		List<Reservation> curReservationsOfHotel = hotel.getReservations();
 		curReservationsOfHotel.remove(reservation);
 		hotel.setReservations(curReservationsOfHotel);
-		hotelDao.save(hotel);
 
 		log.info("Removing reference of Reservation from Customer");
 		List<Reservation> curReservationsOfCustomer = customer.getReservations();
 		curReservationsOfCustomer.remove(reservation);
 		customer.setReservations(curReservationsOfCustomer);
-		customerDao.save(customer);
 
 		log.info("Deletion in progress");
 		reservationDao.delete(reservation);
@@ -148,7 +144,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public Reservation getReservationById(Integer ReservationId) throws ReservationException {
+	public Reservation getReservationById(Long ReservationId) throws ReservationException {
 		Optional<Reservation> optional = reservationDao.findById(ReservationId);
 		if (optional.isEmpty())
 			throw new ReservationException("Reservation not found with reservation id: " + ReservationId);
@@ -170,6 +166,7 @@ public class ReservationServiceImpl implements ReservationService {
 				.checkinDate(reservationDTO.getCheckinDate())
 				.checkoutDate(reservationDTO.getCheckoutDate())
 				.noOfPerson(reservationDTO.getNoOfPerson())
+				.status(ReservationStatus.BOOKED)
 				.build();
 	}
 

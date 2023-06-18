@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.ReservationStatus;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,34 +28,35 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 public class Reservation {
-	
-	@Id @GeneratedValue(strategy = GenerationType.AUTO) @JsonProperty(access = Access.READ_ONLY)
-	private Integer reservationId;
-	
-	@JsonFormat(pattern = "yyyy-MM-dd")
+
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+	@JsonProperty(access = Access.READ_ONLY)
+	private Long reservationId;
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate checkinDate;
-	
-	@JsonFormat(pattern = "yyyy-MM-dd")
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate checkoutDate;
-	
+
 	private Integer noOfPerson;
-	
+
 	@Embedded
 	private Payment payment;
-	
+
 	@Enumerated(EnumType.STRING)
 	private ReservationStatus status;
-	
+
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Room room;
-	
+
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Hotel hotel;
-	
+
 	@JsonIgnore
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Customer customer;
-	
+
 }

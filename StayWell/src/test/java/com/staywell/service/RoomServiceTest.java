@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -34,6 +33,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.staywell.dto.RoomDTO;
+import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.enums.RoomType;
@@ -85,9 +85,9 @@ public class RoomServiceTest {
 		rooms = new ArrayList<>();
 		reservations = new ArrayList<>();
 		feedbacks = new ArrayList<>();
-		rooms.add(new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
+		rooms.add(new Room(1001L, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations));
 
-		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@1234", "9999999999", "9000000000",
+		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@123", "9999999999", "9000000000",
 				HotelType.HOTEL, address, Role.ROLE_HOTEL, amenities, rooms, reservations, feedbacks);
 	}
 
@@ -99,7 +99,7 @@ public class RoomServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("myhotel@gmailcom");
 
-		Room room = new Room(1002, 2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true, hotel, reservations);
+		Room room = new Room(1002L, 2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true, hotel, reservations);
 
 		RoomDTO roomDTO = new RoomDTO(2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true);
 
@@ -134,14 +134,15 @@ public class RoomServiceTest {
 
 		when(hotelDao.save(any())).thenReturn(hotel);
 
-		Room room = new Room(1001, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations);
-		when(roomDao.findById(anyInt())).thenReturn(Optional.of(room));
+		Room room = new Room(1001L, 1, RoomType.AC, 2, BigDecimal.valueOf(5000.0), true, null, reservations);
+		when(roomDao.findById(anyLong())).thenReturn(Optional.of(room));
 
 		assertEquals(1, hotel.getRooms().size());
 
 		doNothing().when(roomDao).delete(any());
 
-		String result = roomService.removeRoom(1001);
+		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("1001", "Pass@123");
+		String result = roomService.removeRoom(updateRequest);
 
 		assertAll(() -> {
 			assertEquals("Room removed successfully", result);

@@ -11,6 +11,7 @@ import com.staywell.model.Address;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class CustomerDTO {
     private String name;
 
 	@NotNull @NotEmpty @NotBlank
+	@Email
     private String email;
 
 	@NotNull @NotEmpty @NotBlank

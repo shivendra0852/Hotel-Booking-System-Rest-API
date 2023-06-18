@@ -2,7 +2,6 @@ package com.staywell.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.Gender;
 import com.staywell.enums.Role;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -23,7 +21,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +38,7 @@ public class Customer {
 
 	private String name;
 
-	@Column(unique = true) @Email
+	@Column(unique = true)
 	private String email;
 
 	@JsonProperty(access = Access.WRITE_ONLY)
@@ -68,7 +65,7 @@ public class Customer {
 	private LocalDateTime deletionScheduledAt;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<Reservation> reservations = new ArrayList<>();
+	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+	private List<Reservation> reservations;
 
 }

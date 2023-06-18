@@ -39,38 +39,39 @@ public class RoomController {
 
 	@PutMapping("/update-room-type/{roomId}")
 	public ResponseEntity<String> updateRoomType(@RequestBody UpdateDetailsDTO updateDetailsRequest,
-			@PathVariable("roomId") Integer roomId) {
+			@PathVariable("roomId") Long roomId) {
 		return new ResponseEntity<String>(roomService.updateRoomType(updateDetailsRequest, roomId),
 				HttpStatus.ACCEPTED);
 	}
 
 	@PutMapping("/update-no-of-person/{roomId}")
 	public ResponseEntity<String> updateNoOfPerson(@RequestBody UpdateDetailsDTO updateDetailsRequest,
-			@PathVariable("roomId") Integer roomId) {
+			@PathVariable("roomId") Long roomId) {
 		return new ResponseEntity<String>(roomService.updateNoOfPerson(updateDetailsRequest, roomId),
 				HttpStatus.ACCEPTED);
 	}
 
 	@PutMapping("/update-price/{roomId}")
 	public ResponseEntity<String> updatePrice(@RequestBody UpdateDetailsDTO updateDetailsRequest,
-			@PathVariable("roomId") Integer roomId) {
+			@PathVariable("roomId") Long roomId) {
 		return new ResponseEntity<String>(roomService.updatePrice(updateDetailsRequest, roomId), HttpStatus.ACCEPTED);
 	}
 
 	@PutMapping("/update-availability/{roomId}")
 	public ResponseEntity<String> updateAvailable(@RequestBody UpdateDetailsDTO updateDetailsRequest,
-			@PathVariable("roomId") Integer roomId) {
+			@PathVariable("roomId") Long roomId) {
 		return new ResponseEntity<String>(roomService.updateAvailable(updateDetailsRequest, roomId),
 				HttpStatus.ACCEPTED);
 	}
 
-	@DeleteMapping("/delete/{roomId}")
-	public ResponseEntity<String> deleteRoom(@PathVariable("roomId") Integer roomId) throws RoomException {
-		ResponseEntity<String> responseEntity = new ResponseEntity<>(roomService.removeRoom(roomId), HttpStatus.OK);
+	@DeleteMapping("/delete")
+	public ResponseEntity<String> deleteRoom(@RequestBody UpdateDetailsDTO updateRequest) throws RoomException {
+		ResponseEntity<String> responseEntity = new ResponseEntity<>(roomService.removeRoom(updateRequest),
+				HttpStatus.OK);
 		return responseEntity;
 	}
 
-	@GetMapping("/get-available-rooms/{hoteId}")
+	@GetMapping("/get-available-rooms/{hotelId}")
 	public ResponseEntity<List<Room>> getAllAvailableRoomsByHotelId(@PathVariable("hotelId") Long hoteId,
 			@Valid @RequestBody DateDTO dateDTO) throws RoomException {
 

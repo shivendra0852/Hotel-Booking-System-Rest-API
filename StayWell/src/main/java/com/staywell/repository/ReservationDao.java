@@ -12,7 +12,7 @@ import com.staywell.model.Hotel;
 import com.staywell.model.Reservation;
 import com.staywell.model.Room;
 
-public interface ReservationDao extends JpaRepository<Reservation, Integer> {
+public interface ReservationDao extends JpaRepository<Reservation, Long> {
 
 	List<Reservation> findByCustomer(Customer customer);
 

@@ -24,32 +24,37 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/staywell/reservations")
 public class ReservationController {
-	
+
 	private ReservationService reservationService;
-	
+
 	@PostMapping("/book/{roomId}/{paymentType}/{txnId}")
-	public ResponseEntity<Reservation> createReservation(@PathVariable("roomId") Integer roomId, @RequestBody ReservationDTO reservationDTO, @PathVariable("paymentType") String paymentType, @PathVariable("txnId") String txnId) throws ReservationException, RoomException{
-		return new ResponseEntity<>(reservationService.createReservation(roomId, reservationDTO, paymentType, txnId), HttpStatus.CREATED);
+	public ResponseEntity<Reservation> createReservation(@PathVariable("roomId") Long roomId,
+			@PathVariable("paymentType") String paymentType, @PathVariable("txnId") String txnId,
+			@RequestBody ReservationDTO reservationDTO) throws ReservationException, RoomException {
+		return new ResponseEntity<>(reservationService.createReservation(roomId, reservationDTO, paymentType, txnId),
+				HttpStatus.CREATED);
 	}
-	
+
 	@PutMapping("/cancel/{reservationId}")
-	public ResponseEntity<String> cancelReservation(@PathVariable("reservationId") Integer reservationId) throws ReservationException{
+	public ResponseEntity<String> cancelReservation(@PathVariable("reservationId") Long reservationId)
+			throws ReservationException {
 		return new ResponseEntity<>(reservationService.cancelReservation(reservationId), HttpStatus.ACCEPTED);
 	}
-	
+
 	@GetMapping("/get-by-hotel")
-	public ResponseEntity<List<Reservation>> getAllReservationsOfHotel() throws ReservationException{
+	public ResponseEntity<List<Reservation>> getAllReservationsOfHotel() throws ReservationException {
 		return new ResponseEntity<>(reservationService.getAllReservationsOfHotel(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/get-by-customer")
-	public ResponseEntity<List<Reservation>> getAllReservationsOfCustomer() throws ReservationException{
+	public ResponseEntity<List<Reservation>> getAllReservationsOfCustomer() throws ReservationException {
 		return new ResponseEntity<>(reservationService.getAllReservationsOfCustomer(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/get-by-id/{reservationId}")
-	public ResponseEntity<Reservation> getReservationById(@PathVariable("reservationId") Integer reservationId) throws ReservationException{
+	public ResponseEntity<Reservation> getReservationById(@PathVariable("reservationId") Long reservationId)
+			throws ReservationException {
 		return new ResponseEntity<>(reservationService.getReservationById(reservationId), HttpStatus.OK);
 	}
-	
+
 }
