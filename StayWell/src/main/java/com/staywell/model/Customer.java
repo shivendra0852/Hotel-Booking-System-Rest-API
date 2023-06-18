@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -56,10 +57,15 @@ public class Customer {
 	@Embedded
 	private Address address;
 
+	@JsonIgnore
 	@Enumerated(EnumType.STRING)
 	private Role role;
+	@JsonFormat(pattern = "dd-MM-yyyy HH:mm")
 	private LocalDateTime registrationDateTime;
-	private Boolean toBeDeleted = false;
+	@JsonIgnore
+	private boolean toBeDeleted;
+	@JsonIgnore
+	private LocalDateTime deletionScheduledAt;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)

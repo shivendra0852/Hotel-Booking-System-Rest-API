@@ -41,14 +41,14 @@ public class CustomerController {
 
 	@PutMapping("/update-password")
 	public ResponseEntity<String> updatePassword(@RequestBody UpdateDetailsDTO updateRequest) {
-		String res = customerService.updateName(updateRequest);
+		String res = customerService.updatePassword(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 
 	}
 
 	@PutMapping("/update-phone")
 	public ResponseEntity<String> updatePhone(@RequestBody UpdateDetailsDTO updateRequest) {
-		String res = customerService.updateName(updateRequest);
+		String res = customerService.updatePhone(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 
 	}
@@ -59,16 +59,16 @@ public class CustomerController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
-	@GetMapping("/getAllCustomer")
-	public ResponseEntity<List<Customer>> getAllCustomer() {
-		List<Customer> res = customerService.getToBeDeletedCustomers();
-		return new ResponseEntity<List<Customer>>(res, HttpStatus.OK);
-	}
-
 	@GetMapping("/getCustomerById/{customerId}")
 	public ResponseEntity<Customer> getCustomerById(@PathVariable("customerId") Long customerId) {
 		Customer res = customerService.getCustomerById(customerId);
 		return new ResponseEntity<Customer>(res, HttpStatus.OK);
+	}
+
+	@GetMapping("/getToBeDeletedAccounts")
+	public ResponseEntity<List<Customer>> getAllCustomer() {
+		List<Customer> res = customerService.getToBeDeletedCustomers();
+		return new ResponseEntity<List<Customer>>(res, HttpStatus.OK);
 	}
 
 }

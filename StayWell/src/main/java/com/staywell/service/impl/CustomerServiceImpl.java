@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.CustomerDTO;
 import com.staywell.dto.UpdateDetailsDTO;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Transactional
 public class CustomerServiceImpl implements CustomerService {
 
 	private CustomerDao customerDao;
@@ -106,6 +108,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		log.info("Setting Account status to be deleted");
 		currentCustomer.setToBeDeleted(true);
+		currentCustomer.setDeletionScheduledAt(LocalDateTime.now());
 		customerDao.save(currentCustomer);
 
 		log.info("Account schelduled for deletion and Logged out!");
@@ -115,8 +118,8 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<Customer> getToBeDeletedCustomers() throws CustomerException {
 		List<Customer> customers = customerDao.findByToBeDeleted(true);
-		if (!customers.isEmpty())
-			throw new CustomerException("Customers not exist");
+		if (customers.isEmpty())
+			throw new CustomerException("No accounts found for deletion");
 		return customers;
 	}
 
@@ -148,6 +151,7 @@ public class CustomerServiceImpl implements CustomerService {
 				.role(Role.ROLE_CUSTOMER)
 				.dob(customerDTO.getDob())
 				.address(customerDTO.getAddress())
+				.toBeDeleted(false)
 				.build();
 	}
 

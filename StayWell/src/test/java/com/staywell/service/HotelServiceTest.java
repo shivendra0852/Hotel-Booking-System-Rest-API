@@ -146,7 +146,7 @@ public class HotelServiceTest {
 	public void testGetHotelsNearMe() {
 		Customer customer = new Customer(Long.valueOf(1001), "prateek", "prateek@gmail.com", "Pass@123", "1111111111",
 				Gender.MALE, LocalDate.of(2002, 04, 26), hotel.getAddress(), Role.ROLE_CUSTOMER, LocalDateTime.now(),
-				false, new ArrayList<>());
+				false, null, new ArrayList<>());
 		SecurityContextHolder.setContext(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn("prateek@gmail.com");
