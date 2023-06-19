@@ -39,8 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private RoomDao roomDao;
 
 	@Override
-	public Reservation createReservation(Long roomId, ReservationDTO reservationDTO, String paymentType,
-			String txnId) throws ReservationException, RoomException {
+	public Reservation createReservation(Long roomId, ReservationDTO reservationDTO, String paymentType, String txnId) {
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Room> opt = roomDao.findById(roomId);
@@ -88,7 +87,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public String cancelReservation(Long reservationId) throws ReservationException {
+	public String cancelReservation(Long reservationId) {
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Reservation> opt = reservationDao.findById(reservationId);
@@ -126,7 +125,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public List<Reservation> getAllReservationsOfHotel() throws ReservationException {
+	public List<Reservation> getAllReservationsOfHotel() {
 		Hotel hotel = getCurrentLoggedInHotel();
 		List<Reservation> reservations = reservationDao.findByHotel(hotel);
 		if (reservations.isEmpty())
@@ -135,7 +134,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public List<Reservation> getAllReservationsOfCustomer() throws ReservationException {
+	public List<Reservation> getAllReservationsOfCustomer() {
 		Customer customer = getCurrentLoggedInCustomer();
 		List<Reservation> reservations = reservationDao.findByCustomer(customer);
 		if (reservations.isEmpty())
@@ -144,7 +143,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public Reservation getReservationById(Long ReservationId) throws ReservationException {
+	public Reservation getReservationById(Long ReservationId) {
 		Optional<Reservation> optional = reservationDao.findById(ReservationId);
 		if (optional.isEmpty())
 			throw new ReservationException("Reservation not found with reservation id: " + ReservationId);

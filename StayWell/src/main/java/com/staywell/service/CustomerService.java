@@ -4,12 +4,11 @@ import java.util.List;
 
 import com.staywell.dto.CustomerDTO;
 import com.staywell.dto.UpdateDetailsDTO;
-import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
 
 public interface CustomerService {
 
-	public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException;
+	public Customer registerCustomer(CustomerDTO customerDTO);
 
 	public String updateName(UpdateDetailsDTO updateRequest);
 
@@ -17,10 +16,10 @@ public interface CustomerService {
 
 	public String updatePhone(UpdateDetailsDTO updateRequest);
 
-	public String deleteCustomer(UpdateDetailsDTO updateRequest) throws CustomerException;
+	public String deleteCustomer(UpdateDetailsDTO updateRequest);
 
-	public List<Customer> getToBeDeletedCustomers() throws CustomerException;
+	public List<Customer> getToBeDeletedCustomers();
 
-	public Customer getCustomerById(Long customerId) throws CustomerException;
+	public Customer getCustomerById(Long customerId);
 
 }

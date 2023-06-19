@@ -16,7 +16,6 @@ import com.staywell.dto.CustomerDTO;
 import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
-import com.staywell.exception.HotelException;
 import com.staywell.model.Customer;
 import com.staywell.model.DeleteReason;
 import com.staywell.model.Reservation;
@@ -40,7 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private DeleteReasonDao deleteReasonDao;
 
 	@Override
-	public Customer registerCustomer(CustomerDTO customerDTO) throws CustomerException {
+	public Customer registerCustomer(CustomerDTO customerDTO) {
 		log.info("Performing email validation");
 		if (isEmailExists(customerDTO.getEmail())) {
 			throw new CustomerException("Customer is already exist ...!");
@@ -60,7 +59,7 @@ public class CustomerServiceImpl implements CustomerService {
 		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new CustomerException("Wrong credentials!");
 		}
 		customerDao.setCustomerEmail(currentCustomer.getCustomerId(), updateRequest.getField());
 
@@ -75,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
 		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new CustomerException("Wrong credentials!");
 		}
 		customerDao.setCustomerPassword(currentCustomer.getCustomerId(),
 				passwordEncoder.encode(updateRequest.getField()));
@@ -91,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
 		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new CustomerException("Wrong credentials!");
 		}
 		customerDao.setCustomerPhone(currentCustomer.getCustomerId(), updateRequest.getField());
 
@@ -100,13 +99,13 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public String deleteCustomer(UpdateDetailsDTO updateRequest) throws CustomerException {
+	public String deleteCustomer(UpdateDetailsDTO updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
 		String password = updateRequest.getPassword();
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new CustomerException("Wrong credentials!");
 		}
 
 		List<Reservation> reservations = currentCustomer.getReservations();
@@ -122,7 +121,7 @@ public class CustomerServiceImpl implements CustomerService {
 		currentCustomer.setToBeDeleted(true);
 		currentCustomer.setDeletionScheduledAt(LocalDateTime.now());
 		customerDao.save(currentCustomer);
-		
+
 		DeleteReason deleteReason = new DeleteReason();
 		deleteReason.setReason(updateRequest.getField());
 		deleteReasonDao.save(deleteReason);
@@ -132,7 +131,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public List<Customer> getToBeDeletedCustomers() throws CustomerException {
+	public List<Customer> getToBeDeletedCustomers() {
 		List<Customer> customers = customerDao.findByToBeDeleted(true);
 		if (customers.isEmpty())
 			throw new CustomerException("No accounts found for deletion");
@@ -140,7 +139,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public Customer getCustomerById(Long customerId) throws CustomerException {
+	public Customer getCustomerById(Long customerId) {
 		Optional<Customer> optional = customerDao.findById(customerId);
 		if (optional.isEmpty())
 			throw new CustomerException("Customer not exist by this Id : " + customerId);
@@ -159,8 +158,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private Customer buildCustomer(CustomerDTO customerDTO) {
 		return Customer.builder()
 				.name(customerDTO.getName())
-				.email(customerDTO.getEmail())
-				.password(passwordEncoder.encode(customerDTO.getPassword()))
+				.email(customerDTO.getEmail()).password(passwordEncoder.encode(customerDTO.getPassword()))
 				.phone(customerDTO.getPhone())
 				.gender(customerDTO.getGender())
 				.registrationDateTime(LocalDateTime.now())

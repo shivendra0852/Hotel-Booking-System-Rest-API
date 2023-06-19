@@ -40,7 +40,7 @@ public class RoomServiceImpl implements RoomService {
 	private ReservationDao reservationDao;
 
 	@Override
-	public Room addRoom(RoomDTO roomDTO) throws RoomException {
+	public Room addRoom(RoomDTO roomDTO) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		List<Room> rooms = hotel.getRooms();
@@ -70,7 +70,7 @@ public class RoomServiceImpl implements RoomService {
 
 		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setRoomType(roomId, RoomType.valueOf(updateRequest.getField()));
 
@@ -84,7 +84,7 @@ public class RoomServiceImpl implements RoomService {
 
 		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setNoOfPerson(roomId, Integer.valueOf(updateRequest.getField()));
 
@@ -98,7 +98,7 @@ public class RoomServiceImpl implements RoomService {
 
 		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setPrice(roomId, BigDecimal.valueOf(Double.valueOf(updateRequest.getField())));
 
@@ -112,7 +112,7 @@ public class RoomServiceImpl implements RoomService {
 
 		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setAvailable(roomId, Boolean.valueOf(updateRequest.getField()));
 
@@ -121,14 +121,14 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String removeRoom(UpdateDetailsDTO updateRequest) throws RoomException {
+	public String removeRoom(UpdateDetailsDTO updateRequest) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
 		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
-			throw new HotelException("Wrong credentials!");
+			throw new RoomException("Wrong credentials!");
 		}
-		
+
 		Long roomId = Long.valueOf(updateRequest.getField());
 		Optional<Room> optional = roomDao.findById(roomId);
 		if (optional.isEmpty())
@@ -167,8 +167,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut)
-			throws RoomException {
+	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut) {
 
 		Optional<Hotel> opt = hotelDao.findById(hotelId);
 		if (opt.isEmpty())
@@ -195,7 +194,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public List<Room> getAllRoomsByHotel() throws RoomException {
+	public List<Room> getAllRoomsByHotel() {
 		Hotel hotel = getCurrentLoggedInHotel();
 		List<Room> rooms = hotel.getRooms();
 		if (rooms.isEmpty())
