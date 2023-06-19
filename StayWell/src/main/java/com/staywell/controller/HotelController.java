@@ -52,7 +52,7 @@ public class HotelController {
 		return new ResponseEntity<>(hotelService.updateHotelType(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 
-	@GetMapping("/getHotelById/{hotelId}")
+	@GetMapping("/get-hotel-by-id/{hotelId}")
 	public ResponseEntity<Hotel> getHotelById(@PathVariable("hotelId") long hotelId) {
 		return new ResponseEntity<Hotel>(hotelService.getHotelById(hotelId), HttpStatus.FOUND);
 	}

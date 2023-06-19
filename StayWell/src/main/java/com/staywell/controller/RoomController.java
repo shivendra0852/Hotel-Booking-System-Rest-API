@@ -24,9 +24,9 @@ import com.staywell.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/staywell/rooms")
+@AllArgsConstructor
 public class RoomController {
 
 	private RoomService roomService;

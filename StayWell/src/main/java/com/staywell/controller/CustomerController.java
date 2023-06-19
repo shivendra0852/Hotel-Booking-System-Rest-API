@@ -2,7 +2,6 @@ package com.staywell.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,11 +18,13 @@ import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.model.Customer;
 import com.staywell.service.CustomerService;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/staywell/customers")
+@AllArgsConstructor
 public class CustomerController {
 
-	@Autowired
 	private CustomerService customerService;
 
 	@PostMapping("/register")
