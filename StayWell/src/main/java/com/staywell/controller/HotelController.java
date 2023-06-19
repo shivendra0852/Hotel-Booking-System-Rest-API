@@ -37,6 +37,12 @@ public class HotelController {
 		return new ResponseEntity<>(hotelService.updateName(updateDetailsRequest), HttpStatus.ACCEPTED);
 	}
 
+	@PutMapping("/update-password")
+	public ResponseEntity<String> updatePassword(@RequestBody UpdateDetailsDTO updateRequest) {
+		String res = hotelService.updatePassword(updateRequest);
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
 	@PutMapping("/update-phone")
 	public ResponseEntity<String> updatePhone(@RequestBody UpdateDetailsDTO updateDetailsRequest) {
 		return new ResponseEntity<>(hotelService.updatePhone(updateDetailsRequest), HttpStatus.ACCEPTED);
