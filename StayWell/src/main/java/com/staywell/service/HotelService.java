@@ -11,6 +11,8 @@ public interface HotelService {
 	public Hotel registerHotel(HotelDTO hotelRequest);
 
 	public String updateName(UpdateDetailsDTO updateRequest);
+	
+	public String updatePassword(UpdateDetailsDTO updateRequest);
 
 	public String updatePhone(UpdateDetailsDTO updateRequest);
 

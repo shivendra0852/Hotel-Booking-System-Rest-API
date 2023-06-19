@@ -13,6 +13,7 @@ import com.staywell.dto.HotelDTO;
 import com.staywell.dto.UpdateDetailsDTO;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
+import com.staywell.exception.CustomerException;
 import com.staywell.exception.HotelException;
 import com.staywell.model.Address;
 import com.staywell.model.Customer;
@@ -67,6 +68,22 @@ public class HotelServiceImpl implements HotelService {
 
 		log.info("Updation successfull");
 		return "Updated hotel name successfully";
+	}
+
+	@Override
+	public String updatePassword(UpdateDetailsDTO updateRequest) {
+		Hotel currentHotel = getCurrentLoggedInHotel();
+
+		log.info("Verifying credentials");
+		String password = updateRequest.getPassword();
+		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
+			throw new HotelException("Wrong credentials!");
+		}
+		hotelDao.setHotelPassword(currentHotel.getHotelId(),
+				passwordEncoder.encode(updateRequest.getField()));
+
+		log.info("Updation successfull");
+		return "Password updated successfully!";
 	}
 
 	@Override

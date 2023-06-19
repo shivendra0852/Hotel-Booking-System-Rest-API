@@ -15,16 +15,20 @@ public interface HotelDao extends JpaRepository<Hotel, Long> {
 	Optional<Hotel> findByHotelEmail(String email);
 
 	@Modifying
+	@Query("update Hotel set name=?2 where hotelId=?1")
+	Integer setNameOfHotel(Long hotelId, String name);
+
+	@Modifying
+	@Query("update Hotel set password=?2 where hotelId=?1")
+	void setHotelPassword(Long hotelId, String password);
+
+	@Modifying
 	@Query("update Hotel set hotelPhone=?2 where hotelId=?1")
 	Integer setPhoneOfHotel(Long hotelId, String phone);
 
 	@Modifying
 	@Query("update Hotel set hotelTelephone=?2 where hotelId=?1")
 	Integer setTelephoneOfHotel(Long hotelId, String telephone);
-
-	@Modifying
-	@Query("update Hotel set name=?2 where hotelId=?1")
-	Integer setNameOfHotel(Long hotelId, String name);
 
 	@Modifying
 	@Query("update Hotel set hotelType=?2 where hotelId=?1")
