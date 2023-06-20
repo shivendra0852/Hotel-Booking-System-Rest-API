@@ -1,4 +1,4 @@
-package com.staywell.dto;
+package com.staywell.dto.request;
 
 import java.time.LocalDate;
 
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerDTO {
+public class CustomerRequest {
 
 	@NotNull @NotEmpty @NotBlank
     private String name;

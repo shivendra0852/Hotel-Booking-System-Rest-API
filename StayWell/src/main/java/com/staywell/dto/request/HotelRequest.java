@@ -1,4 +1,4 @@
-package com.staywell.dto;
+package com.staywell.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HotelDTO {
+public class HotelRequest {
 
 	@NotNull @NotEmpty @NotBlank
 	private String name;

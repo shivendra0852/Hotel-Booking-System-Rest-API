@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.staywell.dto.RoomDTO;
-import com.staywell.dto.UpdateDetailsDTO;
+import com.staywell.dto.request.RoomRequest;
+import com.staywell.dto.request.UpdateRequest;
 import com.staywell.enums.RoomType;
 import com.staywell.exception.HotelException;
 import com.staywell.exception.RoomException;
@@ -40,19 +40,19 @@ public class RoomServiceImpl implements RoomService {
 	private ReservationDao reservationDao;
 
 	@Override
-	public Room addRoom(RoomDTO roomDTO) {
+	public Room addRoom(RoomRequest roomRequest) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		List<Room> rooms = hotel.getRooms();
 		log.info("Validating Room number");
 		for (Room r : rooms) {
-			if (r.getRoomNumber() == roomDTO.getRoomNumber()) {
+			if (r.getRoomNumber() == roomRequest.getRoomNumber()) {
 				throw new RoomException(
-						"Room already present in your hotel with room number : " + roomDTO.getRoomNumber());
+						"Room already present in your hotel with room number : " + roomRequest.getRoomNumber());
 			}
 		}
 
-		Room room = buildRoom(roomDTO);
+		Room room = buildRoom(roomRequest);
 
 		log.info("Assigning room to the Hotel : " + hotel.getName());
 		hotel.getRooms().add(room);
@@ -65,7 +65,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String updateRoomType(UpdateDetailsDTO updateRequest, Long roomId) {
+	public String updateRoomType(UpdateRequest updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -79,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String updateNoOfPerson(UpdateDetailsDTO updateRequest, Long roomId) {
+	public String updateNoOfPerson(UpdateRequest updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -93,7 +93,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String updatePrice(UpdateDetailsDTO updateRequest, Long roomId) {
+	public String updatePrice(UpdateRequest updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -107,7 +107,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String updateAvailable(UpdateDetailsDTO updateRequest, Long roomId) {
+	public String updateAvailable(UpdateRequest updateRequest, Long roomId) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -121,7 +121,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public String removeRoom(UpdateDetailsDTO updateRequest) {
+	public String removeRoom(UpdateRequest updateRequest) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -208,13 +208,13 @@ public class RoomServiceImpl implements RoomService {
 				.orElseThrow(() -> new HotelException("Failed to fetch the hotel with the email: " + email));
 	}
 
-	private Room buildRoom(RoomDTO roomDTO) {
+	private Room buildRoom(RoomRequest roomRequest) {
 		return Room.builder()
-				.roomNumber(roomDTO.getRoomNumber())
-				.roomType(roomDTO.getRoomType())
-				.noOfPerson(roomDTO.getNoOfPerson())
-				.price(roomDTO.getPrice())
-				.available(roomDTO.getAvailable())
+				.roomNumber(roomRequest.getRoomNumber())
+				.roomType(roomRequest.getRoomType())
+				.noOfPerson(roomRequest.getNoOfPerson())
+				.price(roomRequest.getPrice())
+				.available(roomRequest.getAvailable())
 				.reservations(new ArrayList<>())
 				.build();
 	}

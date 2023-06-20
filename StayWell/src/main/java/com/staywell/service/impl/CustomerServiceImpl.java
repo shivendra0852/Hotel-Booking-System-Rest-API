@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.staywell.dto.CustomerDTO;
-import com.staywell.dto.UpdateDetailsDTO;
+import com.staywell.dto.request.CustomerRequest;
+import com.staywell.dto.request.UpdateRequest;
 import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
@@ -39,13 +39,13 @@ public class CustomerServiceImpl implements CustomerService {
 	private DeleteReasonDao deleteReasonDao;
 
 	@Override
-	public Customer registerCustomer(CustomerDTO customerDTO) {
+	public Customer registerCustomer(CustomerRequest customerRequest) {
 		log.info("Performing email validation");
-		if (isEmailExists(customerDTO.getEmail())) {
+		if (isEmailExists(customerRequest.getEmail())) {
 			throw new CustomerException("Customer is already exist ...!");
 		}
 
-		Customer customer = buildCustomer(customerDTO);
+		Customer customer = buildCustomer(customerRequest);
 		customerDao.save(customer);
 
 		log.info("Registration successfull");
@@ -53,7 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public String updateName(UpdateDetailsDTO updateRequest) {
+	public String updateName(UpdateRequest updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
@@ -68,7 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public String updatePassword(UpdateDetailsDTO updateRequest) {
+	public String updatePassword(UpdateRequest updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
@@ -84,7 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public String updatePhone(UpdateDetailsDTO updateRequest) {
+	public String updatePhone(UpdateRequest updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
@@ -99,7 +99,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public String deleteCustomer(UpdateDetailsDTO updateRequest) {
+	public String deleteCustomer(UpdateRequest updateRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
@@ -155,16 +155,16 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
 	}
 
-	private Customer buildCustomer(CustomerDTO customerDTO) {
+	private Customer buildCustomer(CustomerRequest customerRequest) {
 		return Customer.builder()
-				.name(customerDTO.getName())
-				.email(customerDTO.getEmail()).password(passwordEncoder.encode(customerDTO.getPassword()))
-				.phone(customerDTO.getPhone())
-				.gender(customerDTO.getGender())
+				.name(customerRequest.getName())
+				.email(customerRequest.getEmail()).password(passwordEncoder.encode(customerRequest.getPassword()))
+				.phone(customerRequest.getPhone())
+				.gender(customerRequest.getGender())
 				.registrationDateTime(LocalDateTime.now())
 				.role(Role.ROLE_CUSTOMER)
-				.dob(customerDTO.getDob())
-				.address(customerDTO.getAddress())
+				.dob(customerRequest.getDob())
+				.address(customerRequest.getAddress())
 				.toBeDeleted(false)
 				.reservations(new ArrayList<>())
 				.build();

@@ -1,4 +1,4 @@
-package com.staywell.dto;
+package com.staywell.dto.request;
 
 import java.math.BigDecimal;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoomDTO {
+public class RoomRequest {
 
 	@Min(1)
 	private Integer roomNumber;

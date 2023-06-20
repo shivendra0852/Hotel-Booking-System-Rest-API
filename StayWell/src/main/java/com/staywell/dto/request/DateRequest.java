@@ -1,11 +1,11 @@
-package com.staywell.dto;
+package com.staywell.dto.request;
 
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,17 +13,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationDTO {
+public class DateRequest {
 
+	@NotNull @FutureOrPresent
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	@FutureOrPresent
-	private LocalDate checkinDate;
+	LocalDate checkIn;
 
+	@NotNull @FutureOrPresent
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	@FutureOrPresent
-	private LocalDate checkoutDate;
-
-	@Min(1)
-	private Integer noOfPerson;
+	LocalDate checkOut;
 
 }

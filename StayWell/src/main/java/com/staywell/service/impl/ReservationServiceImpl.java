@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.staywell.dto.ReservationDTO;
+import com.staywell.dto.request.ReservationRequest;
 import com.staywell.enums.PaymentType;
 import com.staywell.enums.ReservationStatus;
 import com.staywell.exception.ReservationException;
@@ -39,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private RoomDao roomDao;
 
 	@Override
-	public Reservation createReservation(Long roomId, ReservationDTO reservationDTO, String paymentType, String txnId) {
+	public Reservation createReservation(Long roomId, ReservationRequest reservationRequest, String paymentType, String txnId) {
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Room> opt = roomDao.findById(roomId);
@@ -52,8 +52,8 @@ public class ReservationServiceImpl implements ReservationService {
 
 		List<Reservation> reservations = reservationDao.findByRoomAndStatus(room, ReservationStatus.BOOKED);
 
-		LocalDate checkIn = reservationDTO.getCheckinDate();
-		LocalDate checkOut = reservationDTO.getCheckinDate();
+		LocalDate checkIn = reservationRequest.getCheckinDate();
+		LocalDate checkOut = reservationRequest.getCheckinDate();
 		log.info("Checking Room availability for dates : " + checkIn + " -> " + checkOut);
 		for (Reservation r : reservations) {
 			if ((checkIn.isEqual(r.getCheckinDate()) || checkIn.isEqual(r.getCheckinDate()))
@@ -65,7 +65,7 @@ public class ReservationServiceImpl implements ReservationService {
 		}
 
 		log.info("Building Reservation");
-		Reservation reservation = buildReservation(reservationDTO);
+		Reservation reservation = buildReservation(reservationRequest);
 		reservation.setPayment(new Payment(PaymentType.valueOf(paymentType), txnId));
 
 		log.info("Assigning Reservation to the Room : " + roomId);
@@ -160,11 +160,11 @@ public class ReservationServiceImpl implements ReservationService {
 		return customerDao.findByEmail(email).get();
 	}
 
-	private Reservation buildReservation(ReservationDTO reservationDTO) {
+	private Reservation buildReservation(ReservationRequest reservationRequest) {
 		return Reservation.builder()
-				.checkinDate(reservationDTO.getCheckinDate())
-				.checkoutDate(reservationDTO.getCheckoutDate())
-				.noOfPerson(reservationDTO.getNoOfPerson())
+				.checkinDate(reservationRequest.getCheckinDate())
+				.checkoutDate(reservationRequest.getCheckoutDate())
+				.noOfPerson(reservationRequest.getNoOfPerson())
 				.status(ReservationStatus.BOOKED)
 				.build();
 	}

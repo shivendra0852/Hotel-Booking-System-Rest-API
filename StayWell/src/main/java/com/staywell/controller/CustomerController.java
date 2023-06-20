@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.staywell.dto.CustomerDTO;
-import com.staywell.dto.UpdateDetailsDTO;
+import com.staywell.dto.request.CustomerRequest;
+import com.staywell.dto.request.UpdateRequest;
 import com.staywell.model.Customer;
 import com.staywell.service.CustomerService;
 
@@ -28,34 +28,34 @@ public class CustomerController {
 	private CustomerService customerService;
 
 	@PostMapping("/register")
-	public ResponseEntity<Customer> registerCustomer(@RequestBody CustomerDTO customerDTO) {
-		Customer res = customerService.registerCustomer(customerDTO);
+	public ResponseEntity<Customer> registerCustomer(@RequestBody CustomerRequest customerRequest) {
+		Customer res = customerService.registerCustomer(customerRequest);
 		return new ResponseEntity<Customer>(res, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/update-name")
-	public ResponseEntity<String> updateName(@RequestBody UpdateDetailsDTO updateRequest) {
+	public ResponseEntity<String> updateName(@RequestBody UpdateRequest updateRequest) {
 		String res = customerService.updateName(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 
 	}
 
 	@PutMapping("/update-password")
-	public ResponseEntity<String> updatePassword(@RequestBody UpdateDetailsDTO updateRequest) {
+	public ResponseEntity<String> updatePassword(@RequestBody UpdateRequest updateRequest) {
 		String res = customerService.updatePassword(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 
 	}
 
 	@PutMapping("/update-phone")
-	public ResponseEntity<String> updatePhone(@RequestBody UpdateDetailsDTO updateRequest) {
+	public ResponseEntity<String> updatePhone(@RequestBody UpdateRequest updateRequest) {
 		String res = customerService.updatePhone(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 
 	}
 
 	@DeleteMapping("/delete")
-	public ResponseEntity<String> deleteCustomer(@RequestBody UpdateDetailsDTO updateRequest) {
+	public ResponseEntity<String> deleteCustomer(@RequestBody UpdateRequest updateRequest) {
 		String res = customerService.deleteCustomer(updateRequest);
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}

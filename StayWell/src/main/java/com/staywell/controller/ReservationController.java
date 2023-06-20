@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.staywell.dto.ReservationDTO;
+import com.staywell.dto.request.ReservationRequest;
 import com.staywell.exception.ReservationException;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Reservation;
@@ -30,8 +30,8 @@ public class ReservationController {
 	@PostMapping("/book/{roomId}/{paymentType}/{txnId}")
 	public ResponseEntity<Reservation> createReservation(@PathVariable("roomId") Long roomId,
 			@PathVariable("paymentType") String paymentType, @PathVariable("txnId") String txnId,
-			@RequestBody ReservationDTO reservationDTO) throws ReservationException, RoomException {
-		return new ResponseEntity<>(reservationService.createReservation(roomId, reservationDTO, paymentType, txnId),
+			@RequestBody ReservationRequest reservationRequest) throws ReservationException, RoomException {
+		return new ResponseEntity<>(reservationService.createReservation(roomId, reservationRequest, paymentType, txnId),
 				HttpStatus.CREATED);
 	}
 

@@ -30,8 +30,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.staywell.dto.HotelDTO;
-import com.staywell.dto.UpdateDetailsDTO;
+import com.staywell.dto.request.HotelRequest;
+import com.staywell.dto.request.UpdateRequest;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.enums.RoomType;
@@ -75,7 +75,7 @@ public class HotelServiceTest {
 
 	private Hotel hotel;
 
-	private HotelDTO hotelRequest;
+	private HotelRequest hotelRequest;
 
 	@BeforeEach
 	public void addCommonDetails() {
@@ -88,7 +88,7 @@ public class HotelServiceTest {
 		hotel = new Hotel(Long.valueOf(1), "MyHotel", "myhotel@gmail.com", "Pass@1234", "9999999999", "9000000000",
 				HotelType.HOTEL, address, Role.ROLE_HOTEL, amenities, rooms, reservations, feedbacks);
 
-		hotelRequest = new HotelDTO();
+		hotelRequest = new HotelRequest();
 		hotelRequest.setHotelEmail("myhotel@gmail.com");
 		hotelRequest.setAddress(hotel.getAddress());
 		hotelRequest.setName("MyHotel");
@@ -167,7 +167,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setPhoneOfHotel(anyLong(), anyString())).thenReturn(1);
 
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("9315807215", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("9315807215", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updatePhone(updateRequest);
@@ -187,7 +187,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setTelephoneOfHotel(anyLong(), anyString())).thenReturn(1);
 
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("1234567890", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("1234567890", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updateTelephone(updateRequest);
@@ -207,7 +207,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setNameOfHotel(anyLong(), anyString())).thenReturn(1);
 
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("mynewhotel", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("mynewhotel", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updateName(updateRequest);
@@ -227,7 +227,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setHotelType(anyLong(), any())).thenReturn(1);
 
-		UpdateDetailsDTO updateRequest = new UpdateDetailsDTO("HOTEL", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("HOTEL", "Pass@1234");
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updateHotelType(updateRequest);

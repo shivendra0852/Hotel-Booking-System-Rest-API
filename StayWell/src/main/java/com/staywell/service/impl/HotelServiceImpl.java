@@ -9,8 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.staywell.dto.HotelDTO;
-import com.staywell.dto.UpdateDetailsDTO;
+import com.staywell.dto.request.HotelRequest;
+import com.staywell.dto.request.UpdateRequest;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
@@ -36,19 +36,19 @@ public class HotelServiceImpl implements HotelService {
 	private PasswordEncoder passwordEncoder;
 
 	@Override
-	public Hotel registerHotel(HotelDTO hotelDTO) {
+	public Hotel registerHotel(HotelRequest hotelRequest) {
 
 		log.info("Performing email validation");
-		if (isEmailExists(hotelDTO.getHotelEmail())) {
+		if (isEmailExists(hotelRequest.getHotelEmail())) {
 			throw new HotelException("This email is already registered. Please use a different email to register.");
 		}
 
 		log.info("Verifying Hotel name");
-		if (hotelWithNameAlreadyExitsInYourCity(hotelDTO.getName(), hotelDTO.getAddress())) {
-			throw new HotelException("Hotel already exits in your city with name : " + hotelDTO.getName());
+		if (hotelWithNameAlreadyExitsInYourCity(hotelRequest.getName(), hotelRequest.getAddress())) {
+			throw new HotelException("Hotel already exits in your city with name : " + hotelRequest.getName());
 		}
 
-		Hotel hotel = buildHotel(hotelDTO);
+		Hotel hotel = buildHotel(hotelRequest);
 		hotelDao.save(hotel);
 
 		log.info("Registration successfull");
@@ -56,7 +56,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public String updateName(UpdateDetailsDTO updateRequest) {
+	public String updateName(UpdateRequest updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -71,7 +71,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public String updatePassword(UpdateDetailsDTO updateRequest) {
+	public String updatePassword(UpdateRequest updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -87,7 +87,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public String updatePhone(UpdateDetailsDTO updateRequest) {
+	public String updatePhone(UpdateRequest updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -102,7 +102,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public String updateTelephone(UpdateDetailsDTO updateRequest) {
+	public String updateTelephone(UpdateRequest updateRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -117,7 +117,7 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public String updateHotelType(UpdateDetailsDTO updateRequest) {
+	public String updateHotelType(UpdateRequest updateRequest) {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
@@ -176,16 +176,16 @@ public class HotelServiceImpl implements HotelService {
 		return false;
 	}
 
-	private Hotel buildHotel(HotelDTO hotelDTO) {
+	private Hotel buildHotel(HotelRequest hotelRequest) {
 		return Hotel.builder()
-				.name(hotelDTO.getName())
-				.hotelEmail(hotelDTO.getHotelEmail())
-				.hotelPhone(hotelDTO.getHotelPhone())
-				.hotelTelephone(hotelDTO.getHotelTelephone())
-				.password(passwordEncoder.encode(hotelDTO.getPassword()))
+				.name(hotelRequest.getName())
+				.hotelEmail(hotelRequest.getHotelEmail())
+				.hotelPhone(hotelRequest.getHotelPhone())
+				.hotelTelephone(hotelRequest.getHotelTelephone())
+				.password(passwordEncoder.encode(hotelRequest.getPassword()))
 				.role(Role.ROLE_HOTEL)
-				.hotelType(hotelDTO.getHotelType())
-				.address(hotelDTO.getAddress())
+				.hotelType(hotelRequest.getHotelType())
+				.address(hotelRequest.getAddress())
 				.amenities(new ArrayList<>()).rooms(new ArrayList<>()).reservations(new ArrayList<>()).feedbacks(new ArrayList<>())
 				.build();
 	}
