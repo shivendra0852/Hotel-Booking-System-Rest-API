@@ -34,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.staywell.dto.request.RoomRequest;
 import com.staywell.dto.request.UpdateRequest;
+import com.staywell.dto.response.RoomResponse;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.enums.RoomType;
@@ -101,13 +102,13 @@ public class RoomServiceTest {
 
 		Room room = new Room(1002L, 2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true, hotel, reservations);
 
-		RoomRequest roomRequest = new RoomRequest(2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true);
+		RoomRequest roomRequest = new RoomRequest(new char[] {'1','2','3','4'}, 2, RoomType.AC, 1, BigDecimal.valueOf(2000.0), true);
 
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 
 		when(roomDao.save(any())).thenReturn(room);
 
-		Room myRoom = roomService.addRoom(roomRequest);
+		RoomResponse myRoom = roomService.addRoom(roomRequest);
 
 		assertAll(() -> {
 			assertNotNull(room);
@@ -141,7 +142,7 @@ public class RoomServiceTest {
 
 		doNothing().when(roomDao).delete(any());
 
-		UpdateRequest updateRequest = new UpdateRequest("1001", "Pass@123");
+		UpdateRequest updateRequest = new UpdateRequest("1001", new char[] {'1','2','3','4'});
 		String result = roomService.removeRoom(updateRequest);
 
 		assertAll(() -> {
@@ -164,7 +165,7 @@ public class RoomServiceTest {
 
 		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(hotel));
 
-		List<Room> resultRooms = roomService.getAllAvailableRoomsByHotelId(Long.valueOf(1), null, null);
+		List<RoomResponse> resultRooms = roomService.getAllAvailableRoomsByHotelId(Long.valueOf(1), null);
 
 		assertAll(() -> {
 			assertEquals(1, resultRooms.size());

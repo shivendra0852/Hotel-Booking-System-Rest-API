@@ -3,16 +3,17 @@ package com.staywell.service;
 import java.util.List;
 
 import com.staywell.dto.request.HotelRequest;
+import com.staywell.dto.request.UpdatePasswordRequest;
 import com.staywell.dto.request.UpdateRequest;
-import com.staywell.model.Hotel;
+import com.staywell.dto.response.HotelResponse;
 
 public interface HotelService {
 
-	public Hotel registerHotel(HotelRequest hotelRequest);
+	public HotelResponse registerHotel(HotelRequest hotelRequest);
 
 	public String updateName(UpdateRequest updateRequest);
-	
-	public String updatePassword(UpdateRequest updateRequest);
+
+	public String updatePassword(UpdatePasswordRequest updatePasswordRequest);
 
 	public String updatePhone(UpdateRequest updateRequest);
 
@@ -20,10 +21,10 @@ public interface HotelService {
 
 	public String updateHotelType(UpdateRequest updateRequest);
 
-	public Hotel getHotelById(Long id);
+	public HotelResponse getHotelById(Long id);
 
-	public List<Hotel> getHotelsNearMe();
+	public List<HotelResponse> getHotelsNearMe();
 
-	public List<Hotel> getHotelsInCity(String city);
+	public List<HotelResponse> getHotelsInCity(String city);
 
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.request.CustomerRequest;
+import com.staywell.dto.request.UpdatePasswordRequest;
 import com.staywell.dto.request.UpdateRequest;
+import com.staywell.dto.response.CustomerResponse;
 import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
 import com.staywell.model.Customer;
@@ -39,17 +41,23 @@ public class CustomerServiceImpl implements CustomerService {
 	private DeleteReasonDao deleteReasonDao;
 
 	@Override
-	public Customer registerCustomer(CustomerRequest customerRequest) {
+	public CustomerResponse registerCustomer(CustomerRequest customerRequest) {
 		log.info("Performing email validation");
 		if (isEmailExists(customerRequest.getEmail())) {
 			throw new CustomerException("Customer is already exist ...!");
+		}
+
+		log.info("Validating password");
+		String password = new String(customerRequest.getPassword());
+		if (!matchesRegex(password)) {
+			throw new CustomerException("Password validation failed!");
 		}
 
 		Customer customer = buildCustomer(customerRequest);
 		customerDao.save(customer);
 
 		log.info("Registration successfull");
-		return customer;
+		return buildCustomerResponse(customer);
 	}
 
 	@Override
@@ -57,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
+		String password = new String(updateRequest.getPassword());
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
 			throw new CustomerException("Wrong credentials!");
 		}
@@ -68,16 +76,22 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public String updatePassword(UpdateRequest updateRequest) {
+	public String updatePassword(UpdatePasswordRequest updatePasswordRequest) {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
-		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
+		String currentPassword = new String(updatePasswordRequest.getCurrentPassword());
+		if (!passwordEncoder.matches(currentPassword, currentCustomer.getPassword())) {
 			throw new CustomerException("Wrong credentials!");
 		}
-		customerDao.setCustomerPassword(currentCustomer.getCustomerId(),
-				passwordEncoder.encode(updateRequest.getField()));
+
+		log.info("Validating new password");
+		String newPassword = new String(updatePasswordRequest.getNewPassword());
+		if (!matchesRegex(newPassword)) {
+			throw new CustomerException("New password validation failed!");
+		}
+
+		customerDao.setCustomerPassword(currentCustomer.getCustomerId(), passwordEncoder.encode(newPassword));
 
 		log.info("Updation successfull");
 		return "Password updated successfully!";
@@ -88,7 +102,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
+		String password = new String(updateRequest.getPassword());
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
 			throw new CustomerException("Wrong credentials!");
 		}
@@ -103,7 +117,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer currentCustomer = getCurrentLoggedInCustomer();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
+		String password = new String(updateRequest.getPassword());
 		if (!passwordEncoder.matches(password, currentCustomer.getPassword())) {
 			throw new CustomerException("Wrong credentials!");
 		}
@@ -131,19 +145,17 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public List<Customer> getToBeDeletedCustomers() {
+	public List<CustomerResponse> getToBeDeletedCustomers() {
 		List<Customer> customers = customerDao.findByToBeDeleted(true);
 		if (customers.isEmpty())
 			throw new CustomerException("No accounts found for deletion");
-		return customers;
+		
+		return customers.stream().map(this::buildCustomerResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public Customer getCustomerById(Long customerId) {
-		Optional<Customer> optional = customerDao.findById(customerId);
-		if (optional.isEmpty())
-			throw new CustomerException("Customer not exist by this Id : " + customerId);
-		return optional.get();
+	public CustomerResponse viewProfile() {
+		return buildCustomerResponse(getCurrentLoggedInCustomer());
 	}
 
 	private Customer getCurrentLoggedInCustomer() {
@@ -155,10 +167,17 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerDao.findByEmail(email).isPresent() || hotelDao.findByHotelEmail(email).isPresent();
 	}
 
+	private boolean matchesRegex(String input) {
+		if(input.length()<8)
+			return false;
+		String regex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+		return Pattern.compile(regex).matcher(input).matches();
+	}
+
 	private Customer buildCustomer(CustomerRequest customerRequest) {
 		return Customer.builder()
 				.name(customerRequest.getName())
-				.email(customerRequest.getEmail()).password(passwordEncoder.encode(customerRequest.getPassword()))
+				.email(customerRequest.getEmail()).password(passwordEncoder.encode(new String(customerRequest.getPassword())))
 				.phone(customerRequest.getPhone())
 				.gender(customerRequest.getGender())
 				.registrationDateTime(LocalDateTime.now())
@@ -170,4 +189,16 @@ public class CustomerServiceImpl implements CustomerService {
 				.build();
 	}
 
+	private CustomerResponse buildCustomerResponse(Customer customer) {
+		return CustomerResponse.builder()
+				.customerId(customer.getCustomerId())
+				.name(customer.getName())
+				.email(customer.getEmail())
+				.phone(customer.getPhone())
+				.gender(customer.getGender())
+				.dob(customer.getDob())
+				.address(customer.getAddress())
+				.registrationDateTime(customer.getRegistrationDateTime())
+				.build();
+	}
 }

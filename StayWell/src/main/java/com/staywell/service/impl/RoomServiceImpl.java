@@ -12,8 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.staywell.dto.request.DateRequest;
 import com.staywell.dto.request.RoomRequest;
 import com.staywell.dto.request.UpdateRequest;
+import com.staywell.dto.response.RoomResponse;
 import com.staywell.enums.RoomType;
 import com.staywell.exception.HotelException;
 import com.staywell.exception.RoomException;
@@ -40,10 +42,16 @@ public class RoomServiceImpl implements RoomService {
 	private ReservationDao reservationDao;
 
 	@Override
-	public Room addRoom(RoomRequest roomRequest) {
-		Hotel hotel = getCurrentLoggedInHotel();
+	public RoomResponse addRoom(RoomRequest roomRequest) {
+		Hotel currentHotel = getCurrentLoggedInHotel();
 
-		List<Room> rooms = hotel.getRooms();
+		log.info("Verifying credentials");
+		String password = new String(roomRequest.getPassword());
+		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
+			throw new HotelException("Wrong credentials!");
+		}
+
+		List<Room> rooms = currentHotel.getRooms();
 		log.info("Validating Room number");
 		for (Room r : rooms) {
 			if (r.getRoomNumber() == roomRequest.getRoomNumber()) {
@@ -54,14 +62,14 @@ public class RoomServiceImpl implements RoomService {
 
 		Room room = buildRoom(roomRequest);
 
-		log.info("Assigning room to the Hotel : " + hotel.getName());
-		hotel.getRooms().add(room);
-		room.setHotel(hotel);
+		log.info("Assigning room to the Hotel : " + currentHotel.getName());
+		currentHotel.getRooms().add(room);
+		room.setHotel(currentHotel);
 
 		roomDao.save(room);
 
 		log.info("Room saved successfully");
-		return room;
+		return buildRoomResponse(room);
 	}
 
 	@Override
@@ -69,7 +77,7 @@ public class RoomServiceImpl implements RoomService {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+		if (!passwordEncoder.matches(new String(updateRequest.getPassword()), hotel.getPassword())) {
 			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setRoomType(roomId, RoomType.valueOf(updateRequest.getField()));
@@ -83,7 +91,7 @@ public class RoomServiceImpl implements RoomService {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+		if (!passwordEncoder.matches(new String(updateRequest.getPassword()), hotel.getPassword())) {
 			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setNoOfPerson(roomId, Integer.valueOf(updateRequest.getField()));
@@ -97,7 +105,7 @@ public class RoomServiceImpl implements RoomService {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+		if (!passwordEncoder.matches(new String(updateRequest.getPassword()), hotel.getPassword())) {
 			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setPrice(roomId, BigDecimal.valueOf(Double.valueOf(updateRequest.getField())));
@@ -111,7 +119,7 @@ public class RoomServiceImpl implements RoomService {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+		if (!passwordEncoder.matches(new String(updateRequest.getPassword()), hotel.getPassword())) {
 			throw new RoomException("Wrong credentials!");
 		}
 		roomDao.setAvailable(roomId, Boolean.valueOf(updateRequest.getField()));
@@ -125,7 +133,7 @@ public class RoomServiceImpl implements RoomService {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+		if (!passwordEncoder.matches(new String(updateRequest.getPassword()), hotel.getPassword())) {
 			throw new RoomException("Wrong credentials!");
 		}
 
@@ -167,7 +175,7 @@ public class RoomServiceImpl implements RoomService {
 	}
 
 	@Override
-	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut) {
+	public List<RoomResponse> getAllAvailableRoomsByHotelId(Long hotelId, DateRequest dateRequest) {
 
 		Optional<Hotel> opt = hotelDao.findById(hotelId);
 		if (opt.isEmpty())
@@ -176,6 +184,9 @@ public class RoomServiceImpl implements RoomService {
 
 		List<Room> rooms = hotel.getRooms().stream().filter(h -> h.getAvailable()).collect(Collectors.toList());
 		List<Reservation> reservations = reservationDao.getPendingReservationsOfHotel(hotel);
+		
+		LocalDate checkIn = dateRequest.getCheckIn();
+		LocalDate checkOut = dateRequest.getCheckOut();
 		for (Reservation r : reservations) {
 			for (Room room : rooms) {
 				if ((room.getRoomId() == r.getRoom().getRoomId())
@@ -190,16 +201,16 @@ public class RoomServiceImpl implements RoomService {
 
 		if (rooms.isEmpty())
 			throw new RoomException("Rooms not found in this hotel");
-		return rooms;
+		return rooms.stream().map(this::buildRoomResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Room> getAllRoomsByHotel() {
+	public List<RoomResponse> getAllRoomsByHotel() {
 		Hotel hotel = getCurrentLoggedInHotel();
 		List<Room> rooms = hotel.getRooms();
 		if (rooms.isEmpty())
 			throw new RoomException("No rooms found");
-		return rooms;
+		return rooms.stream().map(this::buildRoomResponse).collect(Collectors.toList());
 	}
 
 	private Hotel getCurrentLoggedInHotel() {
@@ -219,4 +230,14 @@ public class RoomServiceImpl implements RoomService {
 				.build();
 	}
 
+	private RoomResponse buildRoomResponse(Room room) {
+		return RoomResponse.builder()
+				.roomId(room.getRoomId())
+				.roomNumber(room.getRoomNumber())
+				.roomType(room.getRoomType())
+				.noOfPerson(room.getNoOfPerson())
+				.price(room.getPrice())
+				.available(room.getAvailable())
+				.build();
+	}
 }

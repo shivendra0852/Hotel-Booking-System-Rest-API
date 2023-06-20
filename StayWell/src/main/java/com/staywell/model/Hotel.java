@@ -2,9 +2,6 @@ package com.staywell.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 
@@ -31,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Hotel {
 
-	@Id @GeneratedValue(strategy = GenerationType.AUTO)	@JsonProperty(access = Access.READ_ONLY)
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long hotelId;
 
 	private String name;
@@ -39,7 +36,6 @@ public class Hotel {
 	@Column(unique = true)
 	private String hotelEmail;
 
-	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 
 	private String hotelPhone;
@@ -58,15 +54,12 @@ public class Hotel {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> amenities;
 
-	@JsonIgnore
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
 	private List<Room> rooms;
 
-	@JsonIgnore
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
 	private List<Reservation> reservations;
 
-	@JsonIgnore
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
 	private List<Feedback> feedbacks;
 

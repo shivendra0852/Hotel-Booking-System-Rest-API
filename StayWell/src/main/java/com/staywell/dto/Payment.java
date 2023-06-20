@@ -1,4 +1,4 @@
-package com.staywell.model;
+package com.staywell.dto;
 
 import com.staywell.enums.PaymentType;
 
@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Payment {
 
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private PaymentType paymentType;
 

@@ -1,7 +1,7 @@
 package com.staywell.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import java.util.List;
+
 import com.staywell.enums.HotelType;
 import com.staywell.model.Address;
 
@@ -12,8 +12,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,10 +35,8 @@ public class HotelRequest {
 	@NotNull @NotEmpty @NotBlank
 	private String hotelTelephone;
 
-	@JsonProperty(access = Access.WRITE_ONLY)
-	@NotNull @NotEmpty @NotBlank @Size(min = 8)
-	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")
-	private String password;
+	@NotNull
+	private char[] password;
 
 	@Valid
 	private Address address;
@@ -48,5 +44,7 @@ public class HotelRequest {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private HotelType hotelType;
+
+	private List<String> amenities;
 
 }

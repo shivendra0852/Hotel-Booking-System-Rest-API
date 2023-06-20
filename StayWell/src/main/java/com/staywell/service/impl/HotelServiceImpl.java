@@ -3,6 +3,8 @@ package com.staywell.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.request.HotelRequest;
+import com.staywell.dto.request.UpdatePasswordRequest;
 import com.staywell.dto.request.UpdateRequest;
+import com.staywell.dto.response.HotelResponse;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.exception.CustomerException;
@@ -36,7 +40,7 @@ public class HotelServiceImpl implements HotelService {
 	private PasswordEncoder passwordEncoder;
 
 	@Override
-	public Hotel registerHotel(HotelRequest hotelRequest) {
+	public HotelResponse registerHotel(HotelRequest hotelRequest) {
 
 		log.info("Performing email validation");
 		if (isEmailExists(hotelRequest.getHotelEmail())) {
@@ -52,7 +56,7 @@ public class HotelServiceImpl implements HotelService {
 		hotelDao.save(hotel);
 
 		log.info("Registration successfull");
-		return hotel;
+		return buildHotelResponse(hotel);
 	}
 
 	@Override
@@ -60,7 +64,7 @@ public class HotelServiceImpl implements HotelService {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
+		String password = new String(updateRequest.getPassword());
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
@@ -71,16 +75,22 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public String updatePassword(UpdateRequest updateRequest) {
+	public String updatePassword(UpdatePasswordRequest updatePasswordRequest) {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
-		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
+		String currentPassword = new String(updatePasswordRequest.getCurrentPassword());
+		if (!passwordEncoder.matches(currentPassword, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
-		hotelDao.setHotelPassword(currentHotel.getHotelId(),
-				passwordEncoder.encode(updateRequest.getField()));
+
+		log.info("Validating new password");
+		String newPassword = new String(updatePasswordRequest.getNewPassword());
+		if (!matchesRegex(newPassword)) {
+			throw new CustomerException("New password validation failed!");
+		}
+
+		hotelDao.setHotelPassword(currentHotel.getHotelId(), passwordEncoder.encode(newPassword));
 
 		log.info("Updation successfull");
 		return "Password updated successfully!";
@@ -91,7 +101,7 @@ public class HotelServiceImpl implements HotelService {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
+		String password = new String(updateRequest.getPassword());
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
@@ -106,7 +116,7 @@ public class HotelServiceImpl implements HotelService {
 		Hotel currentHotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		String password = updateRequest.getPassword();
+		String password = new String(updateRequest.getPassword());
 		if (!passwordEncoder.matches(password, currentHotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
@@ -121,7 +131,8 @@ public class HotelServiceImpl implements HotelService {
 		Hotel hotel = getCurrentLoggedInHotel();
 
 		log.info("Verifying credentials");
-		if (!passwordEncoder.matches(updateRequest.getPassword(), hotel.getPassword())) {
+		String password = new String(updateRequest.getPassword());
+		if (!passwordEncoder.matches(password, hotel.getPassword())) {
 			throw new HotelException("Wrong credentials!");
 		}
 		hotelDao.setHotelType(hotel.getHotelId(), HotelType.valueOf(updateRequest.getField()));
@@ -131,28 +142,30 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Hotel getHotelById(Long id) {
+	public HotelResponse getHotelById(Long id) {
 		Optional<Hotel> optional = hotelDao.findById(id);
 		if (optional.isPresent())
-			return optional.get();
+			return buildHotelResponse(optional.get());
 		throw new HotelException("No hotel found with id " + id);
 	}
 
 	@Override
-	public List<Hotel> getHotelsNearMe() {
+	public List<HotelResponse> getHotelsNearMe() {
 		Customer customer = getCurrentLoggedInCustomer();
+		System.out.println(111);
 		List<Hotel> hotels = hotelDao.getHotelByCity(customer.getAddress().getCity());
+		System.out.println(222);
 		if (hotels.isEmpty())
 			throw new HotelException("Hotels Not Found In Your Area!");
-		return hotels;
+		return hotels.stream().map(this::buildHotelResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Hotel> getHotelsInCity(String city) {
+	public List<HotelResponse> getHotelsInCity(String city) {
 		List<Hotel> hotels = hotelDao.getHotelByCity(city);
 		if (hotels.isEmpty())
 			throw new HotelException("Hotels Not Found In Your Area!");
-		return hotels;
+		return hotels.stream().map(this::buildHotelResponse).collect(Collectors.toList());
 	}
 
 	private boolean isEmailExists(String email) {
@@ -176,18 +189,35 @@ public class HotelServiceImpl implements HotelService {
 		return false;
 	}
 
+	private boolean matchesRegex(String input) {
+		if(input.length()<8)
+			return false;
+		String regex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+		return Pattern.compile(regex).matcher(input).matches();
+	}
+
 	private Hotel buildHotel(HotelRequest hotelRequest) {
 		return Hotel.builder()
 				.name(hotelRequest.getName())
-				.hotelEmail(hotelRequest.getHotelEmail())
+				.hotelEmail(hotelRequest.getHotelEmail()).password(passwordEncoder.encode(new String(hotelRequest.getPassword())))
 				.hotelPhone(hotelRequest.getHotelPhone())
 				.hotelTelephone(hotelRequest.getHotelTelephone())
-				.password(passwordEncoder.encode(hotelRequest.getPassword()))
 				.role(Role.ROLE_HOTEL)
 				.hotelType(hotelRequest.getHotelType())
 				.address(hotelRequest.getAddress())
-				.amenities(new ArrayList<>()).rooms(new ArrayList<>()).reservations(new ArrayList<>()).feedbacks(new ArrayList<>())
+				.amenities(hotelRequest.getAmenities())
+				.rooms(new ArrayList<>()).reservations(new ArrayList<>()).feedbacks(new ArrayList<>())
 				.build();
 	}
 
+	private HotelResponse buildHotelResponse(Hotel hotel) {
+		return HotelResponse.builder()
+				.hotelId(hotel.getHotelId())
+				.name(hotel.getName())
+				.hotelTelephone(hotel.getHotelTelephone())
+				.address(hotel.getAddress())
+				.hotelType(hotel.getHotelType())
+				.amenities(hotel.getAmenities())
+				.build();
+	}
 }

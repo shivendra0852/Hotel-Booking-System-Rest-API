@@ -1,15 +1,15 @@
 package com.staywell.service;
 
-import java.time.LocalDate;
 import java.util.List;
 
+import com.staywell.dto.request.DateRequest;
 import com.staywell.dto.request.RoomRequest;
 import com.staywell.dto.request.UpdateRequest;
-import com.staywell.model.Room;
+import com.staywell.dto.response.RoomResponse;
 
 public interface RoomService {
 
-	public Room addRoom(RoomRequest roomRequest);
+	public RoomResponse addRoom(RoomRequest roomRequest);
 
 	public String updateRoomType(UpdateRequest updateRequest, Long roomId);
 
@@ -21,8 +21,8 @@ public interface RoomService {
 
 	public String removeRoom(UpdateRequest updateRequest);
 
-	public List<Room> getAllAvailableRoomsByHotelId(Long hotelId, LocalDate checkIn, LocalDate checkOut);
+	public List<RoomResponse> getAllAvailableRoomsByHotelId(Long hotelId, DateRequest dateRequest);
 
-	public List<Room> getAllRoomsByHotel();
+	public List<RoomResponse> getAllRoomsByHotel();
 
 }

@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.staywell.dto.request.ReservationRequest;
+import com.staywell.dto.response.ReservationResponse;
 import com.staywell.exception.ReservationException;
-import com.staywell.exception.RoomException;
-import com.staywell.model.Reservation;
 import com.staywell.service.ReservationService;
 
 import lombok.AllArgsConstructor;
@@ -27,11 +26,10 @@ public class ReservationController {
 
 	private ReservationService reservationService;
 
-	@PostMapping("/book/{roomId}/{paymentType}/{txnId}")
-	public ResponseEntity<Reservation> createReservation(@PathVariable("roomId") Long roomId,
-			@PathVariable("paymentType") String paymentType, @PathVariable("txnId") String txnId,
-			@RequestBody ReservationRequest reservationRequest) throws ReservationException, RoomException {
-		return new ResponseEntity<>(reservationService.createReservation(roomId, reservationRequest, paymentType, txnId),
+	@PostMapping("/book/{roomId}")
+	public ResponseEntity<ReservationResponse> createReservation(@PathVariable("roomId") Long roomId,
+			@RequestBody ReservationRequest reservationRequest) {
+		return new ResponseEntity<>(reservationService.createReservation(roomId, reservationRequest),
 				HttpStatus.CREATED);
 	}
 
@@ -41,19 +39,18 @@ public class ReservationController {
 		return new ResponseEntity<>(reservationService.cancelReservation(reservationId), HttpStatus.ACCEPTED);
 	}
 
-	@GetMapping("/get-by-hotel")
-	public ResponseEntity<List<Reservation>> getAllReservationsOfHotel() throws ReservationException {
+	@GetMapping("/get/by-hotel")
+	public ResponseEntity<List<ReservationResponse>> getAllReservationsOfHotel() {
 		return new ResponseEntity<>(reservationService.getAllReservationsOfHotel(), HttpStatus.OK);
 	}
 
-	@GetMapping("/get-by-customer")
-	public ResponseEntity<List<Reservation>> getAllReservationsOfCustomer() throws ReservationException {
+	@GetMapping("/get/by-customer")
+	public ResponseEntity<List<ReservationResponse>> getAllReservationsOfCustomer() {
 		return new ResponseEntity<>(reservationService.getAllReservationsOfCustomer(), HttpStatus.OK);
 	}
 
-	@GetMapping("/get-by-id/{reservationId}")
-	public ResponseEntity<Reservation> getReservationById(@PathVariable("reservationId") Long reservationId)
-			throws ReservationException {
+	@GetMapping("/get/by-id/{reservationId}")
+	public ResponseEntity<ReservationResponse> getReservationById(@PathVariable("reservationId") Long reservationId) {
 		return new ResponseEntity<>(reservationService.getReservationById(reservationId), HttpStatus.OK);
 	}
 

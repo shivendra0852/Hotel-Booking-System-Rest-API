@@ -3,19 +3,19 @@ package com.staywell.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.staywell.dto.request.ReservationRequest;
-import com.staywell.enums.PaymentType;
+import com.staywell.dto.response.ReservationResponse;
 import com.staywell.enums.ReservationStatus;
 import com.staywell.exception.ReservationException;
 import com.staywell.exception.RoomException;
 import com.staywell.model.Customer;
 import com.staywell.model.Hotel;
-import com.staywell.model.Payment;
 import com.staywell.model.Reservation;
 import com.staywell.model.Room;
 import com.staywell.repository.CustomerDao;
@@ -39,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private RoomDao roomDao;
 
 	@Override
-	public Reservation createReservation(Long roomId, ReservationRequest reservationRequest, String paymentType, String txnId) {
+	public ReservationResponse createReservation(Long roomId, ReservationRequest reservationRequest) {
 		Customer customer = getCurrentLoggedInCustomer();
 
 		Optional<Room> opt = roomDao.findById(roomId);
@@ -60,13 +60,12 @@ public class ReservationServiceImpl implements ReservationService {
 					|| (checkOut.isEqual(r.getCheckinDate()) || checkOut.isEqual(r.getCheckinDate()))
 					|| (checkIn.isAfter(r.getCheckinDate()) && checkIn.isBefore(r.getCheckinDate()))
 					|| (checkOut.isAfter(r.getCheckinDate()) && checkOut.isBefore(r.getCheckinDate()))) {
-				throw new ReservationException("Room not available for this date!");
+				throw new ReservationException("Room not available for this date! Your payment will be transferred back to your account within 30 minutes");
 			}
 		}
 
 		log.info("Building Reservation");
 		Reservation reservation = buildReservation(reservationRequest);
-		reservation.setPayment(new Payment(PaymentType.valueOf(paymentType), txnId));
 
 		log.info("Assigning Reservation to the Room : " + roomId);
 		room.getReservations().add(reservation);
@@ -83,7 +82,7 @@ public class ReservationServiceImpl implements ReservationService {
 		reservationDao.save(reservation);
 
 		log.info("Reservation successfull");
-		return reservation;
+		return buildReservationResponse(reservation);
 	}
 
 	@Override
@@ -125,29 +124,29 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public List<Reservation> getAllReservationsOfHotel() {
+	public List<ReservationResponse> getAllReservationsOfHotel() {
 		Hotel hotel = getCurrentLoggedInHotel();
 		List<Reservation> reservations = reservationDao.findByHotel(hotel);
 		if (reservations.isEmpty())
 			throw new ReservationException("Reservations Not Found!");
-		return reservations;
+		return reservations.stream().map(this::buildReservationResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Reservation> getAllReservationsOfCustomer() {
+	public List<ReservationResponse> getAllReservationsOfCustomer() {
 		Customer customer = getCurrentLoggedInCustomer();
 		List<Reservation> reservations = reservationDao.findByCustomer(customer);
 		if (reservations.isEmpty())
 			throw new ReservationException("Reservations Not Found!");
-		return reservations;
+		return reservations.stream().map(this::buildReservationResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public Reservation getReservationById(Long ReservationId) {
+	public ReservationResponse getReservationById(Long ReservationId) {
 		Optional<Reservation> optional = reservationDao.findById(ReservationId);
 		if (optional.isEmpty())
 			throw new ReservationException("Reservation not found with reservation id: " + ReservationId);
-		return optional.get();
+		return buildReservationResponse(optional.get());
 	}
 
 	private Hotel getCurrentLoggedInHotel() {
@@ -166,6 +165,21 @@ public class ReservationServiceImpl implements ReservationService {
 				.checkoutDate(reservationRequest.getCheckoutDate())
 				.noOfPerson(reservationRequest.getNoOfPerson())
 				.status(ReservationStatus.BOOKED)
+				.payment(reservationRequest.getPayment())
+				.build();
+	}
+
+	private ReservationResponse buildReservationResponse(Reservation reservation) {
+		return ReservationResponse.builder()
+				.reservationId(reservation.getReservationId())
+				.customerName(reservation.getCustomer().getName())
+				.roomNumber(reservation.getRoom().getRoomNumber())
+				.hotelName(reservation.getHotel().getName())
+				.checkinDate(reservation.getCheckinDate())
+				.checkoutDate(reservation.getCheckoutDate())
+				.noOfPerson(reservation.getNoOfPerson())
+				.payment(reservation.getPayment())
+				.status(reservation.getStatus())
 				.build();
 	}
 

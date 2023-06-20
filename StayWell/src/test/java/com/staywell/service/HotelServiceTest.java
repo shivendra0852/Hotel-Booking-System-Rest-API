@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.staywell.dto.request.HotelRequest;
 import com.staywell.dto.request.UpdateRequest;
+import com.staywell.dto.response.HotelResponse;
 import com.staywell.enums.HotelType;
 import com.staywell.enums.Role;
 import com.staywell.enums.RoomType;
@@ -92,7 +93,7 @@ public class HotelServiceTest {
 		hotelRequest.setHotelEmail("myhotel@gmail.com");
 		hotelRequest.setAddress(hotel.getAddress());
 		hotelRequest.setName("MyHotel");
-		hotelRequest.setPassword("1234");
+		hotelRequest.setPassword(new char[] {'1','2','3','4'});
 		hotelRequest.setHotelPhone("9999999999");
 		hotelRequest.setHotelPhone("9000000000");
 		hotelRequest.setHotelType(HotelType.HOTEL);
@@ -107,9 +108,9 @@ public class HotelServiceTest {
 		when(customerDao.findByEmail(anyString())).thenReturn(Optional.empty());
 
 		when(hotelDao.save(any())).thenReturn(dummyHotel);
-		Hotel hotel = hotelService.registerHotel(hotelRequest);
+		HotelResponse hotel = hotelService.registerHotel(hotelRequest);
 
-		assertEquals("myhotel@gmail.com", hotel.getHotelEmail());
+		assertEquals(HotelType.HOTEL, hotel.getHotelType());
 
 		verify(hotelDao, times(1)).findByHotelEmail(anyString());
 		verify(customerDao, times(1)).findByEmail(anyString());
@@ -120,10 +121,10 @@ public class HotelServiceTest {
 	@Order(2)
 	public void testGetHotelById1() {
 		when(hotelDao.findById(anyLong())).thenReturn(Optional.of(hotel));
-		Hotel result = hotelService.getHotelById(1L);
+		HotelResponse result = hotelService.getHotelById(1L);
 
 		assertEquals(1L, result.getHotelId());
-		assertEquals("myhotel@gmail.com", result.getHotelEmail());
+		assertEquals(HotelType.HOTEL, result.getHotelType());
 
 		verify(hotelDao, atMostOnce()).findById(anyLong());
 	}
@@ -148,8 +149,8 @@ public class HotelServiceTest {
 		when(customerDao.findByEmail(anyString())).thenReturn(Optional.of(customer));
 		when(hotelDao.getHotelByCity(anyString())).thenReturn(List.of(hotel));
 
-		List<Hotel> hotels = hotelService.getHotelsNearMe();
-		for (Hotel hotel : hotels) {
+		List<HotelResponse> hotels = hotelService.getHotelsNearMe();
+		for (HotelResponse hotel : hotels) {
 			assertEquals(customer.getAddress(), hotel.getAddress());
 		}
 
@@ -167,7 +168,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setPhoneOfHotel(anyLong(), anyString())).thenReturn(1);
 
-		UpdateRequest updateRequest = new UpdateRequest("9315807215", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("9315807215", new char[] {'1','2','3','4'});
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updatePhone(updateRequest);
@@ -187,7 +188,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setTelephoneOfHotel(anyLong(), anyString())).thenReturn(1);
 
-		UpdateRequest updateRequest = new UpdateRequest("1234567890", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("1234567890", new char[] {'1','2','3','4'});
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updateTelephone(updateRequest);
@@ -207,7 +208,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setNameOfHotel(anyLong(), anyString())).thenReturn(1);
 
-		UpdateRequest updateRequest = new UpdateRequest("mynewhotel", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("mynewhotel", new char[] {'1','2','3','4'});
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updateName(updateRequest);
@@ -227,7 +228,7 @@ public class HotelServiceTest {
 		when(hotelDao.findByHotelEmail(anyString())).thenReturn(Optional.of(hotel));
 		when(hotelDao.setHotelType(anyLong(), any())).thenReturn(1);
 
-		UpdateRequest updateRequest = new UpdateRequest("HOTEL", "Pass@1234");
+		UpdateRequest updateRequest = new UpdateRequest("HOTEL", new char[] {'1','2','3','4'});
 		when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
 		String result = hotelService.updateHotelType(updateRequest);

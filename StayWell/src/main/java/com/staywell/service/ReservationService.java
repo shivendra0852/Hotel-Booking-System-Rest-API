@@ -3,18 +3,18 @@ package com.staywell.service;
 import java.util.List;
 
 import com.staywell.dto.request.ReservationRequest;
-import com.staywell.model.Reservation;
+import com.staywell.dto.response.ReservationResponse;
 
 public interface ReservationService {
 
-	public Reservation createReservation(Long roomId, ReservationRequest reservationRequest, String paymentType, String txnId);
+	public ReservationResponse createReservation(Long roomId, ReservationRequest reservationRequest);
 
 	public String cancelReservation(Long reservationId);
 
-	public List<Reservation> getAllReservationsOfHotel();
+	public List<ReservationResponse> getAllReservationsOfHotel();
 
-	public List<Reservation> getAllReservationsOfCustomer();
+	public List<ReservationResponse> getAllReservationsOfCustomer();
 
-	public Reservation getReservationById(Long ReservationId);
+	public ReservationResponse getReservationById(Long ReservationId);
 
 }

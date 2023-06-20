@@ -4,10 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.staywell.enums.Gender;
 import com.staywell.enums.Role;
 
@@ -33,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Customer {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonProperty(access = Access.READ_ONLY)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long customerId;
 
 	private String name;
@@ -41,7 +37,6 @@ public class Customer {
 	@Column(unique = true)
 	private String email;
 
-	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 
 	private String phone;
@@ -54,17 +49,12 @@ public class Customer {
 	@Embedded
 	private Address address;
 
-	@JsonIgnore
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	@JsonFormat(pattern = "dd-MM-yyyy HH:mm")
 	private LocalDateTime registrationDateTime;
-	@JsonIgnore
 	private boolean toBeDeleted;
-	@JsonIgnore
 	private LocalDateTime deletionScheduledAt;
 
-	@JsonIgnore
 	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
 	private List<Reservation> reservations;
 
